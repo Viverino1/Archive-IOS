@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
-
 import '../theme.dart';
 
 class GenericTextField extends StatelessWidget {

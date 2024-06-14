@@ -1,23 +1,18 @@
-import 'dart:ffi';
-
 import 'package:cupertino_refresh/cupertino_refresh.dart';
 import 'package:fbla_nlc_2024/classes.dart';
-import 'package:fbla_nlc_2024/components/user_image.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import 'package:uuid/uuid.dart';
 
+import '../components/comment.dart';
 import '../data/providors.dart';
 import '../theme.dart';
-import 'academics_page.dart';
-
 class CommentsPage extends StatefulWidget {
-  const CommentsPage({super.key, required this.post, required this.onPageRefresh});
+  const CommentsPage({super.key, required this.post, required this.onCommentsUpdate});
   final PostData post;
-  final Future<List<CommentData>> Function() onPageRefresh;
+  final void Function(List<CommentData> comments) onCommentsUpdate;
 
   @override
   State<CommentsPage> createState() => _CommentsPageState();
@@ -25,15 +20,51 @@ class CommentsPage extends StatefulWidget {
 
 class _CommentsPageState extends State<CommentsPage> {
   bool _isTextFieldActive = false;
+  UserData? _replyToUser = null;
+  CommentData? _replyToComment = null;
+
   @override
   Widget build(BuildContext context) {
-    CommentData dummyComment = CommentData();
-    dummyComment.content = "You've got some great pics!";
-    dummyComment.uid = "RbS0EHckGDfEoXIGHaTmchW5kTj2";
-    dummyComment.id = "id1";
-    dummyComment.time = 1717822800000;
-    dummyComment.likes = [];
-    dummyComment.replies = [];
+    TextEditingController controller = TextEditingController();
+
+    void submit(){
+      FocusScope.of(context).unfocus();
+
+      if(_replyToUser == null){
+        CommentData comment = CommentData();
+        comment.content = controller.value.text;
+        comment.time = DateTime.now().millisecondsSinceEpoch;
+        comment.uid = context.read<UserProvidor>().currentUser.uid;
+        comment.likes = [];
+        comment.id = Uuid().v4();
+        comment.replies = [];
+
+        setState(() {
+          _isTextFieldActive = false;
+          widget.post.comments.add(comment);
+        });
+
+        Firestore.addComment(comment, widget.post);
+      }else{
+        ReplyData reply = ReplyData();
+        reply.content = controller.value.text;
+        reply.time = DateTime.now().millisecondsSinceEpoch;
+        reply.uid = context.read<UserProvidor>().currentUser.uid;
+        reply.likes = [];
+        reply.id = Uuid().v4();
+
+        Firestore.addReply(reply, _replyToComment!, widget.post);
+
+        setState(() {
+          _isTextFieldActive = false;
+          widget.post.comments.firstWhere((c) => c.id == _replyToComment!.id).replies.add(reply);
+          _replyToComment = null;
+          _replyToUser = null;
+        });
+      }
+
+      widget.onCommentsUpdate(widget.post.comments);
+    }
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -61,7 +92,8 @@ class _CommentsPageState extends State<CommentsPage> {
             CupertinoRefresh(
               physics: const AlwaysScrollableScrollPhysics(),
               onRefresh: () async {
-                final comments = await widget.onPageRefresh();
+                //final comments = await widget.onCommentsRefresh();
+                final comments = await Firestore.getComments(widget.post);
                 setState(() {
                   widget.post.comments = comments;
                 });
@@ -69,39 +101,119 @@ class _CommentsPageState extends State<CommentsPage> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: Column(
-                  children: widget.post.comments.map((e) => Comment(comment: e, post: widget.post,)).toList(),
+                  children: widget.post.comments.map((c) => Comment(
+                    comment: c,
+                    post: widget.post,
+                    onDelete: (){
+                      setState(() {
+                        widget.post.comments.removeWhere((p) => p.id == c.id);
+                      });
+                      widget.onCommentsUpdate(widget.post.comments);
+                      Firestore.deleteComment(c, widget.post);
+                    },
+                    onReply: (u){
+                      setState(() {
+                        _replyToUser = u;
+                        _replyToComment = c;
+                      });
+                    },
+                    onRepliesUpdate: widget.onCommentsUpdate,
+                    onLike: (){
+                      setState(() {
+                        if(!widget.post.comments.firstWhere((e) => e.id == c.id).likes.contains(context.read<UserProvidor>().currentUser.uid)){
+                          widget.post.comments.firstWhere((e) => e.id == c.id).likes.add(context.read<UserProvidor>().currentUser.uid);
+                          Firestore.likeComment(c, widget.post, context);
+                        }else{
+                          widget.post.comments.firstWhere((e) => e.id == c.id).likes.remove(context.read<UserProvidor>().currentUser.uid);
+                          Firestore.unLikeComment(c, widget.post, context);
+                        }
+                      });
+                      widget.onCommentsUpdate(widget.post.comments);
+                    },
+                  )).toList(),
                 ),
               ),
             ),
             Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextField(
-                    placeholder: "Add a Comment",
-                    onChange: (String text){},
-                    onFocusChange: (bool isActive){
-                      setState(() {
-                        _isTextFieldActive = isActive;
-                      });
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ..._replyToUser != null? [
+                          Row(children: [
+                            SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CupertinoButton(
+                                  color: CupertinoTheme.of(context).primaryColor,
+                                  minSize: 10,
+                                  borderRadius: BorderRadius.circular(100),
+                                  padding: EdgeInsets.zero,
+                                  onPressed: (){
+                                    FocusScope.of(context).unfocus();
+                                    setState(() {
+                                      _replyToUser = null;
+                                      _replyToComment = null;
+                                    });
+                                  },
+                                  child: const Center(child: Icon(CupertinoIcons.xmark, size: 16,))
+                              ),
+                            ),
+                            SizedBox(width: 8,),
+                            Text("Replying to ${_replyToUser?.firstName} ${_replyToUser?.lastName}", style: subTitle,),
+                          ],),
+                          SizedBox(height: 8,),
+                        ] : [],
+                        CupertinoTextField(
+                          suffix: Padding(
+                            padding: const EdgeInsets.only(right: 3.0),
+                            child: SizedBox(
+                              height: 28,
+                              width: 28,
+                              child: CupertinoButton(
+                                  color: CupertinoTheme.of(context).primaryColor,
+                                  minSize: 10,
+                                  borderRadius: BorderRadius.circular(100),
+                                  padding: EdgeInsets.zero,
+                                  onPressed: submit,
+                                  child: const Center(child: Icon(Icons.arrow_upward_rounded, size: 20,))
+                              ),
+                            ),
+                          ),
+                          controller: controller,
+                          textInputAction: TextInputAction.go,
+                          onSubmitted: (e) => submit(),
+                          onTapOutside: (e){
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              _isTextFieldActive = false;
+                            });
+                          },
+                          onTap: (){
+                            setState(() {
+                              _isTextFieldActive = true;
+                            });
+                          },
+                          onChanged: (e){
 
-                    onSubmit: (e) async{
-                      CommentData comment = CommentData();
-
-                      comment.content = e;
-                      comment.time = DateTime.now().millisecondsSinceEpoch;
-                      comment.uid = context.read<UserProvidor>().currentUser.uid;
-                      comment.likes = [];
-                      comment.id = Uuid().v4();
-
-                      setState(() {
-                        _isTextFieldActive = false;
-                        widget.post.comments.add(comment);
-                      });
-
-                      await Firestore.addComment(comment, widget.post);
-                      await widget.onPageRefresh();
-                    },
+                          },
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: CupertinoTheme.of(context).barBackgroundColor
+                            ),
+                            borderRadius: BorderRadius.circular(100),
+                            color: CupertinoTheme.of(context).barBackgroundColor,
+                          ),
+                          style: subTitle,
+                          placeholder: "Add a Comment",
+                          maxLines: null,
+                        ),
+                      ],
+                    ),
                   ),
                   AnimatedSize(
                     curve: Curves.easeInOut,
@@ -117,166 +229,3 @@ class _CommentsPageState extends State<CommentsPage> {
     );
   }
 }
-
-class TextField extends StatelessWidget {
-  TextField({super.key, required this.placeholder, required this.onChange, this.onFocusChange, this.onSubmit});
-  final String placeholder;
-  final void Function(String e) onChange;
-  final void Function(bool isFocused)? onFocusChange;
-  final void Function(String text)? onSubmit;
-  
-  TextEditingController controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: CupertinoTextField(
-        suffix: Padding(
-          padding: const EdgeInsets.only(right: 3.0),
-          child: Container(
-            height: 28,
-            width: 28,
-            child: CupertinoButton(
-                child: Center(child: Icon(Icons.arrow_upward_rounded, size: 20,)),
-                color: CupertinoTheme.of(context).primaryColor,
-                minSize: 10,
-                borderRadius: BorderRadius.circular(100),
-                padding: EdgeInsets.zero,
-                onPressed: (){
-                  if(onSubmit != null){
-                    onSubmit!(controller.value.text);
-                  }
-                  FocusScope.of(context).unfocus();
-                }
-            ),
-          ),
-        ),
-        controller: controller,
-        textInputAction: TextInputAction.go,
-        onSubmitted: (String e){
-          if(onFocusChange != null){
-            onFocusChange!(false);
-          }
-          if(onSubmit != null){
-            onSubmit!(e);
-          }
-        },
-        onTapOutside: (e){
-          FocusScope.of(context).unfocus();
-          if(onFocusChange != null){
-            onFocusChange!(false);
-          }
-        },
-        onTap: (){
-          if(onFocusChange != null){
-            onFocusChange!(true);
-          }
-        },
-        onChanged: (e){
-          onChange(e);
-        },
-        decoration: BoxDecoration(
-          border: Border.all(
-              width: 2,
-              color: CupertinoTheme.of(context).barBackgroundColor
-          ),
-          borderRadius: BorderRadius.circular(100),
-          color: CupertinoTheme.of(context).barBackgroundColor,
-        ),
-        style: subTitle,
-        placeholder: placeholder,
-        maxLines: null,
-      ),
-    );
-  }
-}
-
-class Comment extends StatelessWidget {
-  const Comment({super.key, required this.comment, required this.post});
-  final CommentData comment;
-  final PostData post;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<UserData?>(
-        future: context.read<UserProvidor>().getUser(comment.uid),
-        builder: (BuildContext context, AsyncSnapshot<UserData?> snapshot){
-          if(snapshot.data != null){
-            UserData user = snapshot.data!;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 24.0, right: 16, left: 16),
-              child: Row(children: [
-                UserImage(user: user),
-                SizedBox(width: 8,),
-                Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Transform.translate(
-                          offset: Offset(0, 0),
-                          child: Row(
-                            children: [
-                              Text("${user.firstName} ${user.lastName}", style: subTitle,),
-                              SizedBox(width: 8,),
-                              CupertinoButton(
-                                onPressed: () {  },
-                                minSize: 0,
-                                padding: EdgeInsets.symmetric(vertical: 1),
-                                // color: CupertinoTheme.of(context).primaryColor,
-                                child: Row(children: [
-                                  Icon(CupertinoIcons.heart, size: 14),
-                                  SizedBox(width: 4),
-                                  Text("0 likes", style: subTitle.copyWith(color: CupertinoTheme.of(context).primaryColor))
-                                ],),
-                              ),
-                              SizedBox(width: 8,),
-                              PullDownButton(
-                                onCanceled: (){
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                },
-                                  itemBuilder: (context) => <PullDownMenuEntry>[
-                                    PullDownMenuItem(
-                                      onTap: (){},
-                                      title: "Reply",
-                                      icon: Icons.reply,
-                                      itemTheme: PullDownMenuItemTheme(
-                                          textStyle: smallTitle
-                                      ),
-                                    ),
-                                    PullDownMenuItem(
-                                      onTap: (){},
-                                      title: "Delete",
-                                      icon: CupertinoIcons.delete,
-                                      itemTheme: PullDownMenuItemTheme(
-                                        textStyle: smallTitle.copyWith(color: Colors.red)
-                                      ),
-                                    ),
-                                  ],
-                                  buttonBuilder: (context, showMenu) => CupertinoButton(
-                                    padding: EdgeInsets.zero,
-                                    minSize: 0,
-                                    onPressed: showMenu,
-                                    child: Icon(Icons.more_horiz_rounded, size: 20),
-                                  )
-                              )
-                            ],
-                          ),
-                        ),
-                        Transform.translate(
-                          offset: Offset(0, -2),
-                          child: Text(comment.content, style: smallTitle, maxLines: 1, overflow: TextOverflow.ellipsis,)
-                        ),
-                      ],
-                    ),
-                  ),
-              ],),
-            );
-          }else{
-            return const Row(children: []);
-          }
-        }
-    );
-  }
-}
-

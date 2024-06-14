@@ -64,7 +64,7 @@ class MyImage extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(15),
       child: CachedNetworkImage(
         key: UniqueKey(),
         imageUrl: url,

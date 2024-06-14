@@ -65,7 +65,7 @@ class UserCard extends StatelessWidget {
             color: CupertinoTheme.of(context).barBackgroundColor,
             width: 2
           ),
-          borderRadius: BorderRadius.circular(15)
+          borderRadius: BorderRadius.circular(10)
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),

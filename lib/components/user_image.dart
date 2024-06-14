@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 
 import '../classes.dart';
-
+String placeholderpfp = "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/placeholderpfp.jpeg?alt=media&token=d0a3d4ca-0e18-4b03-8b8e-d54637ed0b3b";
 class UserImage extends StatelessWidget {
   const UserImage({super.key, required this.user});
-  final UserData user;
+  final UserData? user;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class UserImage extends StatelessWidget {
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   alignment: FractionalOffset.center,
-                  image: NetworkImage(user.photoUrl),
+                  image: NetworkImage(user != null? user!.photoUrl : placeholderpfp),
                 ),
               ),
             )

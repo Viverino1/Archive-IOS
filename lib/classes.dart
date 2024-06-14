@@ -44,6 +44,7 @@ class CommentData{
 class ReplyData{
   String content = "";
   String uid = "";
+  String id = "";
   int time = 0;
   List<String> likes = [];
 }

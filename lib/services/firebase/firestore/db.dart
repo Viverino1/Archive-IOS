@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fbla_nlc_2024/classes.dart';
+import 'package:fbla_nlc_2024/components/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -122,39 +123,45 @@ class Firestore{
         //.orderBy("date", descending: true)
         .get();
 
-    for(int i = 0; i < querySnap.docs.length; i++){
-      final data = querySnap.docs[i].data();
+    querySnap.docs.forEach((doc) async{
+      final data = doc.data();
       final post = PostData();
       post.uid = data['uid'];
       post.pics = List.from(data['pics']);
-      post.comments = [];
       post.description = data['description'];
       post.title = data['title'];
       post.date = data['date'];
       post.type = data['type'];
-      post.id = querySnap.docs[i].id;
+      post.id = doc.id;
       post.likes = List.from(data['likes']);
+      post.user = (await context.read<UserProvidor>().getUser(post.uid))?? UserData();
 
-      UserData? postUser = await context.read<UserProvidor>().getUser(post.uid);
+      List<String> commentIDs = data['comments'].keys.toList();
+      for (var cID in commentIDs) {
+        CommentData comment = CommentData();
+        comment.uid = data['comments'][cID]['uid'];
+        comment.content = data['comments'][cID]['content'];
+        comment.likes = List.from(data['comments'][cID]['likes']);
+        comment.time = data['comments'][cID]['time'];
+        comment.id = cID;
 
-      if(postUser != null){
-        post.user = postUser;
+        List<String> replyIDs = data['comments'][cID]['replies'].keys.toList();
+        for(var rID in replyIDs){
+          ReplyData reply = ReplyData();
+          reply.uid = data['comments'][cID]['replies'][rID]['uid'];
+          reply.content = data['comments'][cID]['replies'][rID]['content'];
+          reply.likes = List.from(data['comments'][cID]['replies'][rID]['likes']);
+          reply.time = data['comments'][cID]['replies'][rID]['time'];
+          reply.id = rID;
+
+          comment.replies.add(reply);
+        }
+
+        post.comments.add(comment);
       }
 
-      List<String> keys = data['comments'].keys.toList();
-      keys.forEach((e) {
-        CommentData comment = CommentData();
-        comment.uid = data['comments'][e]['uid'];
-        comment.content = data['comments'][e]['content'];
-        comment.likes = List.from(data['comments'][e]['likes']);
-        comment.time = data['comments'][e]['time'];
-        comment.id = e;
-        post.comments.add(comment);
-      });
-
       posts.add(post);
-    }
-
+    });
     return posts;
   }
   
@@ -179,16 +186,29 @@ class Firestore{
       post.likes = List.from(data['likes']);
       post.user = user;
 
-      List<String> keys = data['comments'].keys.toList();
-      keys.forEach((e) {
+      List<String> commentIDs = data['comments'].keys.toList();
+      for (var cID in commentIDs) {
         CommentData comment = CommentData();
-        comment.uid = data['comments'][e]['uid'];
-        comment.content = data['comments'][e]['content'];
-        comment.likes = List.from(data['comments'][e]['likes']);
-        comment.time = data['comments'][e]['time'];
-        comment.id = e;
+        comment.uid = data['comments'][cID]['uid'];
+        comment.content = data['comments'][cID]['content'];
+        comment.likes = List.from(data['comments'][cID]['likes']);
+        comment.time = data['comments'][cID]['time'];
+        comment.id = cID;
+
+        List<String> replyIDs = data['comments'][cID]['replies'].keys.toList();
+        for(var rID in replyIDs){
+          ReplyData reply = ReplyData();
+          reply.uid = data['comments'][cID]['replies'][rID]['uid'];
+          reply.content = data['comments'][cID]['replies'][rID]['content'];
+          reply.likes = List.from(data['comments'][cID]['replies'][rID]['likes']);
+          reply.time = data['comments'][cID]['replies'][rID]['time'];
+          reply.id = rID;
+
+          comment.replies.add(reply);
+        }
+
         post.comments.add(comment);
-      });
+      }
 
       posts.add(post);
     });
@@ -207,43 +227,142 @@ class Firestore{
 
     final Map<String, dynamic> data = docSnap.data() as Map<String, dynamic>;
 
-    List<String> keys = data['comments'].keys.toList();
-    keys.forEach((key) {
-      if(comments.indexWhere((e) => e.id == key) < 0){
-        CommentData comment = CommentData();
-        comment.uid = data['comments'][key]['uid'];
-        comment.content = data['comments'][key]['content'];
-        comment.likes = List.from(data['comments'][key]['likes']);
-        comment.time = data['comments'][key]['time'];
-        comment.id = key;
-        comments.add(comment);
+    List<String> commentIDs = data['comments'].keys.toList();
+    for (var cID in commentIDs) {
+      CommentData comment = CommentData();
+      comment.uid = data['comments'][cID]['uid'];
+      comment.content = data['comments'][cID]['content'];
+      comment.likes = List.from(data['comments'][cID]['likes']);
+      comment.time = data['comments'][cID]['time'];
+      comment.id = cID;
+
+      List<String> replyIDs = data['comments'][cID]['replies'].keys.toList();
+      for(var rID in replyIDs){
+        ReplyData reply = ReplyData();
+        reply.uid = data['comments'][cID]['replies'][rID]['uid'];
+        reply.content = data['comments'][cID]['replies'][rID]['content'];
+        reply.likes = List.from(data['comments'][cID]['replies'][rID]['likes']);
+        reply.time = data['comments'][cID]['replies'][rID]['time'];
+        reply.id = rID;
+
+        comment.replies.add(reply);
       }
-    });
+
+      comments.add(comment);
+    }
 
     return comments;
   }
 
   static Future<void> addComment(CommentData comment, PostData post) async{
     DocumentReference docRef = db.collection("posts").doc(post.id);
-    docRef.set({
+    await docRef.set({
       "comments": {
           comment.id: {
           "content": comment.content,
           "likes": comment.likes,
           "time": comment.time,
           "uid": comment.uid,
+          "replies": comment.replies,
         }
       }
     }, SetOptions(merge: true));
   }
 
-  static Future<void> removeComment(CommentData comment, PostData post) async {
+  static Future<void> deleteComment(CommentData comment, PostData post) async {
     DocumentReference docRef = db.collection("posts").doc(post.id);
-    docRef.update({
+    await docRef.set({
       "comments": {
         comment.id: FieldValue.delete()
       }
-    });
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> likeComment(CommentData comment, PostData post, BuildContext context) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+
+    await docRef.set({
+      "comments": {
+        comment.id: {
+          "likes": FieldValue.arrayUnion([context.read<UserProvidor>().currentUser.uid])
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> unLikeComment(CommentData comment, PostData post, BuildContext context) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+
+    await docRef.set({
+      "comments": {
+        comment.id: {
+          "likes": FieldValue.arrayRemove([context.read<UserProvidor>().currentUser.uid])
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> addReply(ReplyData reply, CommentData comment, PostData post) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+    await docRef.set({
+      "comments": {
+        comment.id: {
+          "replies": {
+            reply.id: {
+              "content": reply.content,
+              "likes": reply.likes,
+              "time": reply.time,
+              "uid": reply.uid,
+            }
+          }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> deleteReply(ReplyData reply, CommentData comment, PostData post) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+    await docRef.set({
+      "comments": {
+        comment.id: {
+          "replies": {
+            reply.id: FieldValue.delete()
+          }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> likeReply(ReplyData reply, CommentData comment, PostData post, BuildContext context) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+
+    await docRef.set({
+      "comments": {
+        comment.id: {
+          "replies": {
+            reply.id: {
+              "likes": FieldValue.arrayUnion([context.read<UserProvidor>().currentUser.uid])
+            }
+          }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> unLikeReply(ReplyData reply, CommentData comment, PostData post, BuildContext context) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+
+    await docRef.set({
+      "comments": {
+        comment.id: {
+          "replies": {
+            reply.id: {
+              "likes": FieldValue.arrayRemove([context.read<UserProvidor>().currentUser.uid])
+            }
+          }
+        }
+      }
+    }, SetOptions(merge: true));
   }
 
   static void testFunc() async{

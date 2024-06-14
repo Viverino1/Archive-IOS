@@ -16,10 +16,10 @@ import '../pages/comments_page.dart';
 import '../utils.dart';
 
 class Post extends StatefulWidget {
-  Post({super.key, required this.postData, this.onDelete, required this.onCommentsRefresh});
+  Post({super.key, required this.postData, this.onDelete, required this.onCommentsUpdate});
   final PostData postData;
   final Function()? onDelete;
-  final Future<List<CommentData>> Function() onCommentsRefresh;
+  final Function(List<CommentData> comments) onCommentsUpdate;
 
   @override
   State<Post> createState() => _PostState();
@@ -85,7 +85,7 @@ class _PostState extends State<Post> {
               child: Row(
                 children: [
                   Icon(Icons.favorite_border, size: 24,),
-                  SizedBox(width: 8,),
+                  SizedBox(width: 4,),
                   Text("${widget.postData.likes.length} Likes"),
                 ],
               ),
@@ -97,7 +97,7 @@ class _PostState extends State<Post> {
                     context,
                     MaterialPageRoute(builder: (context) => CommentsPage(
                       post: widget.postData,
-                      onPageRefresh: widget.onCommentsRefresh,
+                      onCommentsUpdate: widget.onCommentsUpdate,
                     ))
                 );
               },
