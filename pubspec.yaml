@@ -57,6 +57,9 @@ dependencies:
   flutter_native_splash: ^2.4.0
   image_picker: ^1.1.0
   cross_file_image: ^1.1.0
+  pull_to_refresh_flutter3: ^2.0.2
+  custom_refresh_indicator: ^3.1.0
+  uuid: ^4.4.0
 
 dev_dependencies:
   flutter_test:

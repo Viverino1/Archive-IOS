@@ -1,17 +1,28 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 
 import '../theme.dart';
 
 class GenericTextField extends StatelessWidget {
-  const GenericTextField({super.key, required this.placeholder, required this.onChange});
+  GenericTextField({super.key, required this.placeholder, required this.onChange, this.onFocusChange});
   final String placeholder;
   final void Function(String e) onChange;
+  final void Function(bool isFocused)? onFocusChange;
 
   @override
   Widget build(BuildContext context) {
     return CupertinoTextField(
       onTapOutside: (e){
         FocusScope.of(context).unfocus();
+        if(onFocusChange != null){
+          onFocusChange!(false);
+        }
+      },
+      onTap: (){
+        if(onFocusChange != null){
+          onFocusChange!(true);
+        }
       },
       onChanged: (e) => onChange(e),
       decoration: BoxDecoration(

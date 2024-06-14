@@ -183,9 +183,7 @@ class RegisterPage extends StatelessWidget {
                         Navigator.pop(context);
                         context.read<UserProvidor>().setCurrentUser(user);
                         context.read<UserProvidor>().setIsAuthenticated(true);
-                        context.read<PostDataProvidor>().setUserPosts([]);
                         final userPosts = await Firestore.getUserPosts(user);
-                        context.read<PostDataProvidor>().setUserPosts(userPosts);
                   });
 
                   showCupertinoDialog(

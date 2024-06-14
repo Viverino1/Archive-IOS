@@ -52,7 +52,7 @@ class HomePage extends StatelessWidget {
           return CupertinoTabView(
             builder: (BuildContext context) {
               switch(index){
-                case 3: return ProfilePage(user: context.read<UserProvidor>().currentUser,);
+                case 3: return ProfilePage(user: context.watch<UserProvidor>().currentUser,);
                 case 2: return NewUpdatePage();
                 case 1: return NetworkPage();
                 case 0: return FeedPage();

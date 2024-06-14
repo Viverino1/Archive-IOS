@@ -27,7 +27,6 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvidor()),
-        ChangeNotifierProvider(create: (_) => PostDataProvidor()),
       ],
       child: const MyApp(),
     ),
@@ -59,18 +58,10 @@ class _MyAppState extends State<MyApp> {
     final fbu = FirebaseAuth.instance.currentUser;
 
     if(fbu != null){
-      final UserData? user = await Firestore.getUser(fbu.uid);
+      final UserData? user = await context.read<UserProvidor>().getUser(fbu.uid);
       if(user != null){
         context.read<UserProvidor>().setCurrentUser(user);
         context.read<UserProvidor>().setIsAuthenticated(true);
-
-        final userPosts = await Firestore.getUserPosts(user);
-        context.read<PostDataProvidor>().setUserPosts(userPosts);
-
-        final feedPosts = await Firestore.getFeedPosts(user);
-        context.read<PostDataProvidor>().setFeedPosts(feedPosts);
-
-
       }
     }
   }

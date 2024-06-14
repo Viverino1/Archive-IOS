@@ -12,6 +12,7 @@ class UserData{ UserData();
   String uid = "";
   String school = "";
   double volunteerHours = 0;
+  List<String> following = [];
 }
 
 class PostData{
@@ -27,12 +28,14 @@ class PostData{
   List<String> pics = [];
   List<String> likes = [];
   List<CommentData> comments = [];
+
   UserData user = UserData();
 }
 
 class CommentData{
   String content = "";
   String uid = "";
+  String id = "";
   int time = 0;
   List<String> likes = [];
   List<ReplyData> replies = [];

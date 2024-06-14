@@ -41,7 +41,7 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
         navigationBar: CupertinoNavigationBar(
           leading: Container(
             alignment: AlignmentDirectional.centerStart,
-            child: Text("Create New Post", style: title),
+            child: Text("Create New Update", style: title),
           ),
           trailing: CupertinoButton(
             onPressed: () {
@@ -52,7 +52,7 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                   builder: (BuildContext context){
                     dialogContext = context;
                     return CupertinoAlertDialog(
-                      title: Text("Creating Post", style: smallTitle,),
+                      title: Text("Creating Update", style: smallTitle,),
                       content: Column(
                         children: [
                           SizedBox(height: 8,),
