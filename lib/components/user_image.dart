@@ -1,20 +1,24 @@
 import 'package:fbla_nlc_2024/pages/profile_page.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../classes.dart';
+import '../data/providors.dart';
 String placeholderpfp = "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/placeholderpfp.jpeg?alt=media&token=d0a3d4ca-0e18-4b03-8b8e-d54637ed0b3b";
 class UserImage extends StatelessWidget {
-  const UserImage({super.key, required this.user});
+  const UserImage({super.key, required this.user, required this.isMine});
   final UserData? user;
+  final bool isMine;
 
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
-      onPressed: (){
+      onPressed: isMine? (){
+
+      } : (){
         if(user != null){
-          Navigator.push(
-              context,
-              CupertinoPageRoute(builder: (context) => ProfilePage(user: user!,))
+          Navigator.of(context, rootNavigator: true).push(
+              CupertinoPageRoute(builder: (context) => ProfilePage(user: user!, isMine: user!.uid == context.read<UserProvidor>().currentUser.uid,))
           );
         }
       },

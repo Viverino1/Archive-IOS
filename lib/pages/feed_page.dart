@@ -56,6 +56,7 @@ class _FeedPageState extends State<FeedPage> {
               children: _posts.map((post) => Column(children: [
                 Post(
                     postData: post,
+                    isMine: false,
                     onDelete: (){
                       setState(() {
                         _posts.remove(post);

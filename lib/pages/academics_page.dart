@@ -14,8 +14,9 @@ import '../data/providors.dart';
 import '../theme.dart';
 
 class AcademicsPage extends StatefulWidget {
-  const AcademicsPage({super.key, required this.user});
+  const AcademicsPage({super.key, required this.user, required this.isMine});
   final UserData user;
+  final bool isMine;
 
   @override
   State<AcademicsPage> createState() => _AcademicsPageState();
@@ -101,20 +102,22 @@ class _AcademicsPageState extends State<AcademicsPage> {
                           },
                         ) : Container(),
                         Spacer(),
-                        CupertinoButton(
-                            child: Icon(CupertinoIcons.add),
-                            minSize: 0,
-                            padding: EdgeInsets.all(1),
-                            onPressed: (){
-                              Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(builder: (context) => AddClassPage(
-                                    startSem: _sem,
-                                    startYear: _year,
-                                  ))
-                              );
-                            }
-                        )
+                        ...(widget.isMine? [
+                          CupertinoButton(
+                              child: Icon(CupertinoIcons.add),
+                              minSize: 0,
+                              padding: EdgeInsets.all(1),
+                              onPressed: (){
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(builder: (context) => AddClassPage(
+                                      startSem: _sem,
+                                      startYear: _year,
+                                    ))
+                                );
+                              }
+                          )
+                        ] : [])
                       ],
                     ),
                     children: widget.user.classData[_year]?[_sem]?.map((e) =>

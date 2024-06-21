@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../classes.dart';
 import '../theme.dart';
 
 class NetworkPage extends StatelessWidget {
@@ -40,7 +41,7 @@ class NetworkPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      UserCard()
+                      UserCard(user: context.read<UserProvidor>().currentUser,)
                     ],
                   ),
                 ),
@@ -53,7 +54,8 @@ class NetworkPage extends StatelessWidget {
 }
 
 class UserCard extends StatelessWidget {
-  const UserCard({super.key});
+  const UserCard({super.key, required this.user});
+  final UserData user;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class UserCard extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              UserImage(user: context.read<UserProvidor>().currentUser),
+              UserImage(user: user, isMine: user.uid == context.read<UserProvidor>().currentUser.uid,),
               SizedBox(width: 8,),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -13,10 +13,11 @@ import '../pages/comments_page.dart';
 import '../utils.dart';
 
 class Post extends StatefulWidget {
-  Post({super.key, required this.postData, this.onDelete, required this.onCommentsUpdate});
+  Post({super.key, required this.postData, this.onDelete, required this.onCommentsUpdate, required this.isMine});
   final PostData postData;
   final Function()? onDelete;
   final Function(List<CommentData> comments) onCommentsUpdate;
+  final bool isMine;
 
   @override
   State<Post> createState() => _PostState();
@@ -33,7 +34,7 @@ class _PostState extends State<Post> {
         Row(
           children: [
             SizedBox(width: 16,),
-            UserImage(user: widget.postData.user),
+            UserImage(user: widget.postData.user, isMine: widget.isMine,),
             SizedBox(width: 12,),
             Container(
               width: 290,
@@ -98,8 +99,7 @@ class _PostState extends State<Post> {
             Spacer(),
             CupertinoButton(
               onPressed: () {
-                Navigator.push(
-                    context,
+                Navigator.of(context, rootNavigator: true).push(
                     CupertinoPageRoute(builder: (context) => CommentsPage(
                       post: widget.postData,
                       onCommentsUpdate: widget.onCommentsUpdate,
@@ -114,16 +114,18 @@ class _PostState extends State<Post> {
               padding: EdgeInsets.zero,
               child: Icon(Icons.share_outlined, size: 24,),
             ),
-            CupertinoButton(
-              onPressed: () async {
-                if(widget.onDelete != null){
-                  widget.onDelete!();
-                }
-                await Firestore.deletePost(widget.postData);
-              },
-              padding: EdgeInsets.zero,
-              child: Icon(CupertinoIcons.trash, size: 24,),
-            ),
+            ...(widget.isMine? [
+              CupertinoButton(
+                onPressed: () async {
+                  if(widget.onDelete != null){
+                    widget.onDelete!();
+                  }
+                  await Firestore.deletePost(widget.postData);
+                },
+                padding: EdgeInsets.zero,
+                child: Icon(CupertinoIcons.trash, size: 24,),
+              ),
+            ] : []),
             SizedBox(width: 8,),
           ],
         ),

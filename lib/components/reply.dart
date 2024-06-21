@@ -36,7 +36,7 @@ class _ReplyState extends State<Reply> {
             child: Padding(
               padding: const EdgeInsets.only(top: 16, left: 32),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                UserImage(user: user),
+                UserImage(user: user, isMine: user?.uid == context.read<UserProvidor>().currentUser.uid,),
                 SizedBox(width: 8,),
                 Flexible(
                   child: Column(

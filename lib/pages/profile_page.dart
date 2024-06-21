@@ -14,14 +14,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../classes.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.user});
+  const ProfilePage({super.key, required this.user, required this.isMine});
   final UserData user;
+  final bool isMine;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   static List<PostData> _posts = [];
+  static String _lastUID = "";
 
   @override
   void initState() {
@@ -30,28 +32,57 @@ class _ProfilePageState extends State<ProfilePage> {
       Firestore.getUserPosts(widget.user).then((posts) => {
         setState(() {
           _posts = posts;
+          _lastUID = widget.user.uid;
         })
       });
     });
   }
 
   @override
+  void didUpdateWidget(covariant ProfilePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(widget.user.uid != _lastUID){
+      Firestore.getUserPosts(widget.user).then((posts) => {
+        setState(() {
+          _posts = posts;
+          _lastUID = widget.user.uid;
+        })
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if(_lastUID != widget.user.uid){
+      setState(() {
+        _posts = [];
+      });
+    }
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           transitionBetweenRoutes: false,
           leading: Container(
             alignment: AlignmentDirectional.centerStart,
-            child: Text("${widget.user.firstName}'s Profile", style: title),
+            child: Row(
+              children: [
+                ...(!widget.isMine? [CupertinoButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  padding: EdgeInsets.zero,
+                  child: const Icon(Icons.chevron_left_rounded, size: 36, color: Colors.white,),
+                )] : []),
+                Text("${widget.user.firstName}'s Profile", style: title),
+              ],
+            ),
           ),
           trailing: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               CupertinoButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(builder: (context) => AcademicsPage(user: widget.user,))
+                  Navigator.of(context, rootNavigator: true).push(
+                      CupertinoPageRoute(builder: (context) => AcademicsPage(user: widget.user, isMine: widget.isMine,))
                   );
                 },
                 padding: EdgeInsets.zero,
@@ -62,16 +93,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 padding: EdgeInsets.zero,
                 child: Icon(Icons.share_outlined, size: 24,),
               ),
-              CupertinoButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      CupertinoPageRoute(builder: (context) => SettingsPage())
-                  );
-                },
-                padding: EdgeInsets.zero,
-                child: Icon(CupertinoIcons.settings, size: 24,),
-              ),
+              ...(widget.isMine? [
+                CupertinoButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(builder: (context) => SettingsPage())
+                    );
+                  },
+                  padding: EdgeInsets.zero,
+                  child: Icon(CupertinoIcons.settings, size: 24,),
+                ),
+              ] : [])
             ],
           ),
           backgroundColor: Colors.transparent,
@@ -106,8 +139,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: CupertinoTheme.of(context).primaryColor,
-                                    spreadRadius: 8,
-                                    blurRadius: 64,
+                                    spreadRadius: 1,
+                                    blurRadius: 32,
                                   ),
                                 ]
                             ),
@@ -166,18 +199,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(height: 8,),
                   Text("${widget.user.firstName} ${widget.user.lastName}", style: title),
                   Text("${widget.user.school}", style: subTitle),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      width: double.infinity,
-                      height: 2,
-                      color: CupertinoTheme.of(context).barBackgroundColor,
-                    ),
-                  ),
                   Column(
                     children: _posts.map((e) => Column(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Container(
+                            width: double.infinity,
+                            height: 2,
+                            color: CupertinoTheme.of(context).barBackgroundColor,
+                          ),
+                        ),
                         Post(
+                          isMine: widget.isMine,
                           postData: e,
                           onDelete: () {
                             setState(() {
@@ -189,14 +223,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               _posts.firstWhere((post) => post.id == e.id).comments = comments;
                             });
                           },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Container(
-                            width: double.infinity,
-                            height: 2,
-                            color: CupertinoTheme.of(context).barBackgroundColor,
-                          ),
                         ),
                       ],
                     )).toList(),
