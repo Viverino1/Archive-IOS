@@ -13,6 +13,36 @@ class UserData{ UserData();
   String school = "";
   double volunteerHours = 0;
   List<String> following = [];
+  Map<String, Map<String, List<ClassData>>> classData = {
+    "risingFreshman": {
+      "sem1": [],
+    },
+    "freshman": {
+      "sem1": [],
+      "sem2": [],
+    },
+    "risingSophomore": {
+      "sem1": [],
+    },
+    "sophomore": {
+      "sem1": [],
+      "sem2": [],
+    },
+    "risingJunior": {
+      "sem1": [],
+    },
+    "Junior": {
+      "sem1": [],
+      "sem2": [],
+    },
+    "risingSenior": {
+      "sem1": [],
+    },
+    "Senior": {
+      "sem1": [],
+      "sem2": [],
+    },
+  };
 }
 
 class PostData{
@@ -47,4 +77,11 @@ class ReplyData{
   String id = "";
   int time = 0;
   List<String> likes = [];
+}
+
+class ClassData{
+  ClassData();
+  String name = "";
+  String description = "";
+  double grade = 0;
 }

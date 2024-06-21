@@ -10,6 +10,7 @@ import 'package:fbla_nlc_2024/pages/home_page.dart';
 import 'package:fbla_nlc_2024/pages/register_page.dart';
 import 'package:fbla_nlc_2024/pages/settings_page.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
+import 'package:fbla_nlc_2024/services/gemini/gemini.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,6 +56,8 @@ class _MyAppState extends State<MyApp> {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
+    Gemini.init();
+
     final fbu = FirebaseAuth.instance.currentUser;
 
     if(fbu != null){
@@ -73,7 +76,6 @@ class _MyAppState extends State<MyApp> {
       theme: cupertinoDark,
       home: context.watch<UserProvidor>().isAuthenticated? HomePage() : HeroPage(),
       routes: {
-        '/academics': (context) => AcademicsPage(),
         '/auth': (context) => AuthPage(),
         '/register': (context) => RegisterPage(),
         '/settings': (context) => SettingsPage(),

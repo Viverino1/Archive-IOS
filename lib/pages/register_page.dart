@@ -2,6 +2,7 @@
 import 'package:fbla_nlc_2024/classes.dart';
 import 'package:fbla_nlc_2024/components/generic_text_field.dart';
 import 'package:fbla_nlc_2024/components/picker.dart';
+import 'package:fbla_nlc_2024/pages/home_page.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,241 +12,478 @@ import 'package:provider/provider.dart';
 import '../data/providors.dart';
 import '../theme.dart';
 
-class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key,});
+class RegisterPage extends StatefulWidget {
+  RegisterPage({super.key,});
+  String pastGPA = "";
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController _gpaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     UserData user = UserData();
     user.gradYear = DateTime.now().year + 6;
-    bool isValidVolunteerHours = false;
-    bool isValidGPA = false;
 
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
       navigationBar: CupertinoNavigationBar(
         leading: Container(
           alignment: AlignmentDirectional.centerStart,
-          child: Text("Register", style: title),
+          child: Row(
+            children: [
+              SizedBox(width: 4,),
+              Text("Register", style: title),
+              Spacer(),
+              CupertinoButton(
+                child: Text("Create Account", style: smallTitle,),
+                minSize: 0,
+                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                color: CupertinoTheme.of(context).primaryColor,
+                onPressed: () async{
+                  showCupertinoDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (_) => CupertinoAlertDialog(
+                      title: Column(
+                        children: [
+                          CupertinoActivityIndicator(radius: 12,),
+                          SizedBox(height: 8,),
+                          Text("Creating Account", style: smallTitle,),
+                        ],
+                      ),
+                      content: Text("Just a moment, we're setting up your account!", style: subTitle,),
+                    )
+                  );
+                  await Firestore.registerUser(user);
+                  context.read<UserProvidor>().setCurrentUser(user);
+                  context.read<UserProvidor>().setIsAuthenticated(true);
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                      context,
+                      CupertinoPageRoute(builder: (context) => HomePage())
+                  );
+
+                  // Firestore.registerUser(user)
+                  //           .then((value) async {
+                  //         Navigator.pop(context);
+                  //         Navigator.pop(context);
+                  //         Navigator.pop(context);
+                  //         context.read<UserProvidor>().setCurrentUser(user);
+                  //         context.read<UserProvidor>().setIsAuthenticated(true);
+                  //       });
+                  //
+                  //       showCupertinoDialog(
+                  //           context: context,
+                  //           //barrierDismissible: true,
+                  //           builder: (_) => CupertinoAlertDialog(
+                  //             title: Text("Creating Account", style: smallTitle,),
+                  //             content: Column(
+                  //               children: [
+                  //                 SizedBox(height: 8,),
+                  //                 CupertinoActivityIndicator(radius: 16,),
+                  //               ],
+                  //             ),
+                  //           )
+                  //       );
+                }
+              ),
+              SizedBox(width: 16,),
+            ],
+          ),
         ),
         backgroundColor: Colors.transparent,
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 112, right: 16, left: 16),
-        child: Column(
-          children: [
-            Row(children: [Text("Basic Info", style: smallTitle,),],),
-            SizedBox(height: 8,),
-            GenericTextField(
-                placeholder: "First Name",
-                onChange: (e){
-                  user.firstName = e;
-                }
-            ),
-            SizedBox(height: 8,),
-            GenericTextField(
-                placeholder: "Last Name",
-                onChange: (e){
-                  user.lastName = e;
-                }
-            ),
-            SizedBox(height: 8,),
-            GenericTextField(
-                placeholder: "School",
-                onChange: (e){
-                  user.school = e;
-                }
-            ),
-            SizedBox(height: 8,),
-            GenericTextField(
-                placeholder: "Volunteer Hours",
-                onChange: (e){
-                  try{
-                    double d = double.parse(e);
-                    if(d >= 0){
-                      isValidVolunteerHours = true;
-                      user.volunteerHours = d;
-                    }else{
-                      user.volunteerHours = 0;
-                      isValidVolunteerHours = false;
-                    }
-                  }catch (e){
-                    user.volunteerHours = 0;
-                    isValidVolunteerHours = false;
-                  }
-                }
-            ),
-            SizedBox(height: 8,),
-            GenericTextField(
-                placeholder: "Unweighted GPA",
-                onChange: (e){
-                  try{
-                    double d = double.parse(e);
-                    if(d >= 0.0 && d <= 4.0){
-                      isValidGPA = true;
-                      user.gpa = d;
-                    }else{
-                      user.gpa = 0;
-                      isValidGPA = false;
-                    }
-                  }catch (e){
-                    user.gpa = 0;
-                    isValidGPA = false;
-                  }
-                }
-            ),
-            SizedBox(height: 8,),
-            Picker(
-                options: List.generate(200, (index) => (DateTime.now().year - index + 6).toString()),
-                placeHolder: "Graduation Year",
-                onChange: (e){
-                  user.gradYear = int.parse(e);
-                }
-            ),
-            SizedBox(height: 24,),
-            Row(children: [Text("Test Scores", style: smallTitle,),],),
-            SizedBox(height: 4,),
-            Picker(
-              onChange: (e){
-                try{
-                  final score = int.parse(e);
-                  user.act = score;
-                }catch (err){
-                  if(e == "I prefer not to say."){
-                    user.act = -2;
-                  }else if(e == "Untested"){
-                    user.act = -1;
-                  }
-                }
-              },
-              placeHolder: "ACT",
-              options: ["I prefer not to say.", "Untested"] + List.generate(36, (index) => (36 - index).toString()),
-            ),
-            SizedBox(height: 8,),
-            Picker(
-              onChange: (e){
-                try{
-                  final score = int.parse(e);
-                  user.preact = score;
-                }catch (err){
-                  if(e == "I prefer not to say."){
-                    user.preact = -2;
-                  }else if(e == "Untested"){
-                    user.preact = -1;
-                  }
-                }
-              },
-              placeHolder: "Pre-ACT",
-              options: ["I prefer not to say.", "Untested"] + List.generate(35, (index) => (36 - index).toString()),
-            ),
-            SizedBox(height: 8,),
-            Picker(
-              onChange: (e){
-                try{
-                  final score = int.parse(e);
-                  user.sat = score;
-                }catch (err){
-                  if(e == "I prefer not to say."){
-                    user.sat = -2;
-                  }else if(e == "Untested"){
-                    user.sat = -1;
-                  }
-                }
-              },
-              placeHolder: "SAT",
-              options: ["I prefer not to say.", "Untested"] + List.generate(1201, (index) => (1200 - index + 400).toString()),
-            ),
-            SizedBox(height: 8,),
-            Picker(
-              onChange: (e){
-                try{
-                  final score = int.parse(e);
-                  user.psat = score;
-                }catch (err){
-                  if(e == "I prefer not to say."){
-                    user.psat = -2;
-                  }else if(e == "Untested"){
-                    user.psat = -1;
-                  }
-                }
-              },
-              placeHolder: "PSAT",
-              options: ["I prefer not to say.", "Untested"] + List.generate(1101, (index) => (1200 - index + 400).toString()),
-            ),
-            Spacer(),
-            CupertinoButton(
-              onPressed: (){
-                if(isValidGPA && isValidVolunteerHours){
-                  Firestore.registerUser(user)
-                      .then((value) async {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        context.read<UserProvidor>().setCurrentUser(user);
-                        context.read<UserProvidor>().setIsAuthenticated(true);
-                        final userPosts = await Firestore.getUserPosts(user);
-                  });
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints){
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 102, right: 16, left: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, bottom: 2),
+                    child: Text("First Name", style: subTitle,),
+                  ),
+                  CupertinoTextField(
+                    onTapOutside: (e){
+                      FocusScope.of(context).unfocus();
+                    },
+                    onChanged: (e){
+                      user.firstName = e;
+                      print(e);
+                    },
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 2,
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        color: CupertinoTheme.of(context).barBackgroundColor
+                    ),
+                    placeholder: "John",
+                    style: smallTitle,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                    child: Text("Last Name", style: subTitle,),
+                  ),
+                  CupertinoTextField(
+                    onTapOutside: (e){
+                      FocusScope.of(context).unfocus();
+                    },
+                    onChanged: (e){
+                      user.lastName = e;
+                    },
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 2,
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        color: CupertinoTheme.of(context).barBackgroundColor
+                    ),
+                    placeholder: "Doe",
+                    style: smallTitle,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                    child: Text("School", style: subTitle,),
+                  ),
+                  CupertinoTextField(
+                    onTapOutside: (e){
+                      FocusScope.of(context).unfocus();
+                    },
+                    onChanged: (e){
+                      user.school = e;
+                    },
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 2,
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        color: CupertinoTheme.of(context).barBackgroundColor
+                    ),
+                    placeholder: "Lafayette High School",
+                    style: smallTitle,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                    child: Text("Total Service Hours", style: subTitle,),
+                  ),
+                  CupertinoTextField(
+                    keyboardType: TextInputType.number,
+                    onTapOutside: (e){
+                      FocusScope.of(context).unfocus();
+                    },
+                    onChanged: (e){
+                      user.volunteerHours = e != ""? double.parse(e) : 0;
+                    },
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 2,
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        color: CupertinoTheme.of(context).barBackgroundColor
+                    ),
+                    placeholder: "85",
+                    style: smallTitle,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                    child: Text("Unweighted Cumulative GPA", style: subTitle,),
+                  ),
+                  CupertinoTextField(
+                    onTapOutside: (e){
+                      FocusScope.of(context).unfocus();
+                    },
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    controller: _gpaController,
+                    onChanged: (e){
+                      if(e.length > 4|| (e.substring(e.indexOf(".")+1).contains(".")) || (!e.contains(".") && e.length > 1) ||(e != ""? double.parse(e) > 4 : false)){
+                        setState(() {
+                          _gpaController.text = widget.pastGPA;
+                        });
+                      }else{
+                        user.gpa = e != ""? double.parse(e) : 0;
+                        widget.pastGPA = e;
+                      }
+                    },
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 2,
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        color: CupertinoTheme.of(context).barBackgroundColor
+                    ),
+                    placeholder: "3.87",
+                    style: smallTitle,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                    child: Text("Graduation Year", style: subTitle,),
+                  ),
+                  CustomPicker(
+                      options: List.generate(200, (index) => (DateTime.now().year - index + 6).toString()),
+                      onChange: (e){
+                        user.gradYear = int.parse(e);
+                      }
+                  ),
+                  SizedBox(height: 12,),
+                  Text("Official Test Scores", style: smallTitle,),
+                  SizedBox(height: 8,),
 
-                  showCupertinoDialog(
-                      context: context,
-                      //barrierDismissible: true,
-                      builder: (_) => CupertinoAlertDialog(
-                        title: Text("Creating Account", style: smallTitle,),
-                        content: Column(
-                          children: [
-                            SizedBox(height: 8,),
-                            CupertinoActivityIndicator(radius: 16,),
-                          ],
-                        ),
-                      )
-                  );
-
-                }else if(!isValidVolunteerHours){
-                  showCupertinoDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (_) => CupertinoAlertDialog(
-                        title: Text("Invalid Volunteer Hours", style: smallTitle,),
-                        content: Column(
-                          children: [
-                            SizedBox(height: 8,),
-                            Text("Volunteer hours must be inputted as a positive whole number.", style: subTitle,),
-                          ],
-                        ),
-                        actions: [
-                          CupertinoButton(child: Text("Ok"), onPressed: (){
-                            Navigator.pop(context);
-                          })
-                        ],
-                      )
-                  );
-                }else if(!isValidGPA){
-                  showCupertinoDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (_) => CupertinoAlertDialog(
-                        title: Text("Invalid GPA", style: smallTitle,),
-                        content: Column(
-                          children: [
-                            SizedBox(height: 8,),
-                            Text("Unweighted GPA must be inputted as a positive number between 0.0 and 4.0.", style: subTitle,),
-                          ],
-                        ),
-                        actions: [
-                          CupertinoButton(child: Text("Ok"), onPressed: (){
-                            Navigator.pop(context);
-                          })
-                        ],
-                      )
-                  );
-                }
-              },
-              color: CupertinoTheme.of(context).primaryColor,
-              child: Text("Register"),
+                  Row(
+                    children: [
+                      TestScorePicker(
+                        test: "ACT",
+                        initial: 0,
+                        onChange: (e){
+                          if(e == "N/A"){
+                            user.act = -1;
+                          }else{
+                            user.act = int.parse(e);
+                          }
+                        },
+                        options: ["N/A"] + List.generate(36, (index) => (36 - index).toString()),
+                      ),
+                      SizedBox(width: 12,),
+                      TestScorePicker(
+                        initial: 0,
+                        test: "Pre-ACT",
+                        onChange: (e){
+                          if(e == "N/A"){
+                            user.preact = -1;
+                          }else{
+                            user.preact = int.parse(e);
+                          }
+                        },
+                        options: ["N/A"] + List.generate(36, (index) => (35 - index).toString()),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12,),
+                  Row(
+                    children: [
+                      TestScorePicker(
+                        initial: 0,
+                        test: "SAT",
+                        onChange: (e){
+                          if(e == "N/A"){
+                            user.sat = -1;
+                          }else{
+                            user.sat = int.parse(e);
+                          }
+                        },
+                        options: ["N/A"] + List.generate(1201, (index) => (1200 - index + 400).toString()),
+                      ),
+                      SizedBox(width: 12,),
+                      TestScorePicker(
+                        initial: 0,
+                        test: "PSAT",
+                        onChange: (e){
+                          if(e == "N/A"){
+                            user.psat = -1;
+                          }else{
+                            user.psat = int.parse(e);
+                          }
+                        },
+                        options: ["N/A"] + List.generate(1101, (index) => (1200 - index + 400).toString()),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Spacer(),
-            SizedBox(height: 24),
-          ],
+          );
+        }
+      )
+    );
+  }
+}
+
+class CustomPicker extends StatefulWidget {
+  CustomPicker({super.key, required this.options, required this.onChange});
+  final List<String> options;
+  final void Function(String e) onChange;
+
+  @override
+  CustomPickerState createState() => CustomPickerState();
+}
+
+class CustomPickerState extends State<CustomPicker> {
+  int _selected = 0;
+
+  void reset(){
+    setState(() {
+      _selected = 0;
+    });
+  }
+
+  void _showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        // The Bottom margin is provided to align the popup above the system navigation bar.
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        // Provide a background color for the popup.
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        // Use a SafeArea widget to avoid system overlaps.
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CupertinoButton(
+          onPressed: () => _showDialog(
+            CupertinoPicker(
+              magnification: 1.22,
+              squeeze: 1.2,
+              useMagnifier: true,
+              itemExtent: 32,
+              // This sets the initial item.
+              scrollController: FixedExtentScrollController(
+                initialItem: _selected,
+              ),
+              // This is called when selected item is changed.
+              onSelectedItemChanged: (int selectedItem) {
+                setState(() {
+                  _selected = selectedItem;
+                  widget.onChange(widget.options[selectedItem]);
+                });
+              },
+              children:
+              List<Widget>.generate(widget.options.length, (int index) {
+                return Center(child: Text(widget.options[index], style: smallTitle.copyWith(fontSize: 24),));
+              }),
+            ),
+          ),
+          color: CupertinoTheme.of(context).barBackgroundColor,
+          minSize: 0,
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Row(
+            children: [
+              Text("${widget.options[_selected]}", style: smallTitle.copyWith(color: Colors.white60),),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TestScorePicker extends StatefulWidget {
+  TestScorePicker({super.key, required this.options, required this.onChange, required this.test, required this.initial});
+  final List<String> options;
+  final void Function(String e) onChange;
+  final String test;
+  final int initial;
+
+  @override
+  TestScorePickerState createState() => TestScorePickerState();
+}
+
+class TestScorePickerState extends State<TestScorePicker> {
+  int _selected = 0;
+
+  void reset(){
+    setState(() {
+      _selected = 0;
+    });
+  }
+
+  void _showDialog(Widget child) {
+    showCupertinoModalPopup(context: context,
+        builder: (BuildContext context) => Container(
+          height: 216,
+          padding: const EdgeInsets.only(top: 6.0),
+          // The Bottom margin is provided to align the popup above the system navigation bar.
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          // Provide a background color for the popup.
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          // Use a SafeArea widget to avoid system overlaps.
+          child: SafeArea(
+            top: false,
+            child: child,
+          ),
+        ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.initial;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+            color: CupertinoTheme.of(context).barBackgroundColor,
+            borderRadius: BorderRadius.circular(12)
+        ),
+        child: CupertinoButton(
+          onPressed: () => _showDialog(
+            CupertinoPicker(
+              magnification: 1.22,
+              squeeze: 1.2,
+              useMagnifier: true,
+              itemExtent: 32,
+              // This sets the initial item.
+              scrollController: FixedExtentScrollController(
+                initialItem: _selected,
+              ),
+              // This is called when selected item is changed.
+              onSelectedItemChanged: (int selectedItem) {
+                setState(() {
+                  _selected = selectedItem;
+                  widget.onChange(widget.options[selectedItem]);
+                });
+              },
+              children:
+              List<Widget>.generate(widget.options.length, (int index) {
+                return Center(child: Text(widget.options[index], style: smallTitle.copyWith(fontSize: 24),));
+              }),
+            ),
+          ),
+          // color: CupertinoTheme.of(context).barBackgroundColor,
+          minSize: 0,
+          padding: EdgeInsets.zero,
+          child: Container(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12.0, top: 4),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${widget.options[_selected]}", style: title.copyWith(color: Colors.white, fontSize: 38),),
+                    Text(widget.test, style: subTitle,),
+                  ],
+                ),
+              )
+          ),
         ),
       ),
     );

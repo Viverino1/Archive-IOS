@@ -42,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
           transitionBetweenRoutes: false,
           leading: Container(
             alignment: AlignmentDirectional.centerStart,
-            child: Text("Your Profile", style: title),
+            child: Text("${widget.user.firstName}'s Profile", style: title),
           ),
           trailing: Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AcademicsPage())
+                      CupertinoPageRoute(builder: (context) => AcademicsPage(user: widget.user,))
                   );
                 },
                 padding: EdgeInsets.zero,
@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SettingsPage())
+                      CupertinoPageRoute(builder: (context) => SettingsPage())
                   );
                 },
                 padding: EdgeInsets.zero,
@@ -87,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 });
                 return true;
               },
-              child:  Column(
+              child: Column(
                 children: [
                   SizedBox(height: 24,),
                   Center(

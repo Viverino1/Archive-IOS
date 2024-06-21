@@ -1,17 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'dart:ffi';
-import 'dart:ui';
-
 import 'package:fbla_nlc_2024/components/carousel.dart';
 import 'package:fbla_nlc_2024/components/user_image.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
 import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../classes.dart';
+import '../data/providors.dart';
 import '../pages/comments_page.dart';
 import '../utils.dart';
 
@@ -29,6 +26,7 @@ class _PostState extends State<Post> {
   bool _isExpanded = false;
   @override
   Widget build(BuildContext context) {
+    bool isLiked = widget.postData.likes.contains(context.read<UserProvidor>().currentUser.uid);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -80,11 +78,18 @@ class _PostState extends State<Post> {
           children: [
             SizedBox(width: 16,),
             CupertinoButton(
-              onPressed: () {},
+              onPressed: () {
+                isLiked? Firestore.unLikePost(widget.postData, context) : Firestore.likePost(widget.postData, context);
+                setState(() {
+                  isLiked?
+                  widget.postData.likes.removeWhere((uid) => uid == context.read<UserProvidor>().currentUser.uid) :
+                  widget.postData.likes.add(context.read<UserProvidor>().currentUser.uid);
+                });
+              },
               padding: EdgeInsets.zero,
               child: Row(
                 children: [
-                  Icon(Icons.favorite_border, size: 24,),
+                  Icon(isLiked? CupertinoIcons.heart_fill : CupertinoIcons.heart, size: 24, color: isLiked? Colors.red : CupertinoTheme.of(context).primaryColor,),
                   SizedBox(width: 4,),
                   Text("${widget.postData.likes.length} Likes"),
                 ],
@@ -95,7 +100,7 @@ class _PostState extends State<Post> {
               onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CommentsPage(
+                    CupertinoPageRoute(builder: (context) => CommentsPage(
                       post: widget.postData,
                       onCommentsUpdate: widget.onCommentsUpdate,
                     ))

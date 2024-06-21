@@ -1,3 +1,4 @@
+import 'package:fbla_nlc_2024/pages/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../classes.dart';
@@ -9,7 +10,14 @@ class UserImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
-      onPressed: (){},
+      onPressed: (){
+        if(user != null){
+          Navigator.push(
+              context,
+              CupertinoPageRoute(builder: (context) => ProfilePage(user: user!,))
+          );
+        }
+      },
       padding: EdgeInsets.zero,
       minSize: 0,
       child: Container(

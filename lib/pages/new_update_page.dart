@@ -119,6 +119,10 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                                 ],
                               ),
                               SizedBox(height: 16,),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 2.0, bottom: 2),
+                                child: Text("Post Title", style: subTitle,),
+                              ),
                               CupertinoTextField(
                                 onTapOutside: (e){
                                   FocusScope.of(context).unfocus();
@@ -135,10 +139,14 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                                     borderRadius: BorderRadius.circular(12),
                                     color: CupertinoTheme.of(context).barBackgroundColor
                                 ),
-                                placeholder: "Title",
+                                placeholder: "2nd Place in FBLA Missouri SLC",
                                 style: smallTitle,
                               ),
                               SizedBox(height: 16,),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 2.0, bottom: 2),
+                                child: Text("Post Description", style: subTitle,),
+                              ),
                               CupertinoTextField(
                                 onTapOutside: (e){
                                   FocusScope.of(context).unfocus();
@@ -156,8 +164,9 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                                     color: CupertinoTheme.of(context).barBackgroundColor
                                 ),
                                 style: subTitle,
-                                placeholder: "Description",
+                                placeholder: "In the Future Business Leaders of America (FBLA)...",
                                 maxLines: null,
+
                               ),
                             ],
                           ),

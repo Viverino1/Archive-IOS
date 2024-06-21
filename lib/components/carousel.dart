@@ -71,11 +71,10 @@ class MyImage extends StatelessWidget {
         height: 200,
         width: 300,
         fit: BoxFit.cover,
-        // progressIndicatorBuailder: (context, url, downloadProgress) =>
-        //     Padding(
-        //       padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 55),
-        //       child: CircularProgressIndicator(value: downloadProgress.progress),
-        //     ),
+        progressIndicatorBuilder: (context, url, downloadProgress) => Container(
+          color: CupertinoTheme.of(context).barBackgroundColor,
+          child: CupertinoActivityIndicator(radius: 16,)
+        )
       ),
     );
   }

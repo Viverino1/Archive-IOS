@@ -35,9 +35,7 @@ class _CommentsPageState extends State<CommentsPage> {
         comment.content = controller.value.text;
         comment.time = DateTime.now().millisecondsSinceEpoch;
         comment.uid = context.read<UserProvidor>().currentUser.uid;
-        comment.likes = [];
         comment.id = Uuid().v4();
-        comment.replies = [];
 
         setState(() {
           _isTextFieldActive = false;
@@ -218,7 +216,7 @@ class _CommentsPageState extends State<CommentsPage> {
                   AnimatedSize(
                     curve: Curves.easeInOut,
                     duration: Duration(milliseconds: 250),
-                    child: SizedBox(height: _isTextFieldActive? 16 : 86,),
+                    child: SizedBox(height: _isTextFieldActive? 16 : 32,),
                   )
                 ]
             )

@@ -37,12 +37,28 @@ class Firestore{
     user.uid = data?["uid"];
     user.sat = data?["sat"];
     user.act = data?["act"];
+    user.gpa = data?["gpa"];
     user.psat = data?["psat"];
     user.preact = data?["preact"];
     user.school = data?["school"];
     user.volunteerHours = data?["volunteerHours"];
     user.gradYear = data?["gradYear"];
     user.following = List.from(data?['following']);
+
+    for(var year in data?["classes"].keys.toList()){
+      for(var sem in data?["classes"][year].keys.toList()){
+        for(var className in data?["classes"][year][sem].keys.toList()){
+          Map<String, dynamic> classData = data?["classes"][year][sem][className];
+          ClassData classDataObj = ClassData();
+
+          classDataObj.name = className;
+          classDataObj.grade = classData["grade"];
+          classDataObj.description = classData["description"];
+
+          user.classData[year]?[sem]?.add(classDataObj);
+        }
+      }
+    }
 
     return user;
   }
@@ -64,9 +80,13 @@ class Firestore{
       "psat": user.psat,
       "preact": user.preact,
       "school": user.school,
+      "gpa": user.gpa,
       "volunteerHours": user.volunteerHours,
       "gradYear": user.gradYear,
       "following": user.following,
+      "classes": {
+
+      }
     });
 
     return user;
@@ -114,16 +134,16 @@ class Firestore{
     await db.collection("posts").doc(post.id).delete();
   }
 
-  static Future<List<PostData>> getFeedPosts(UserData user, BuildContext context) async{
+  static Future<List<PostData>> getFeedPosts(BuildContext context) async{
     List<PostData> posts = [];
 
     // final querySnap = await db.collection("posts").where("uid", whereIn: [user.uid]).get();
     final querySnap = await db.collection("posts")
-        .where("uid", isNotEqualTo: user.uid)
+        .where("uid", isNotEqualTo: context.read<UserProvidor>().currentUser.uid)
         //.orderBy("date", descending: true)
         .get();
 
-    querySnap.docs.forEach((doc) async{
+    for(var doc in querySnap.docs){
       final data = doc.data();
       final post = PostData();
       post.uid = data['uid'];
@@ -161,7 +181,7 @@ class Firestore{
       }
 
       posts.add(post);
-    });
+    }
     return posts;
   }
   
@@ -215,6 +235,22 @@ class Firestore{
     return posts;
   }
 
+  static Future<void> likePost(PostData post, BuildContext context) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+
+    await docRef.set({
+      "likes": FieldValue.arrayUnion([context.read<UserProvidor>().currentUser.uid])
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> unLikePost(PostData post, BuildContext context) async {
+    DocumentReference docRef = db.collection("posts").doc(post.id);
+
+    await docRef.set({
+      "likes": FieldValue.arrayRemove([context.read<UserProvidor>().currentUser.uid])
+    }, SetOptions(merge: true));
+  }
+
   static Future<List<CommentData>> getComments(PostData post) async {
     DocumentReference docRef = db.collection("posts").doc(post.id);
     DocumentSnapshot docSnap = await docRef.get();
@@ -260,10 +296,10 @@ class Firestore{
       "comments": {
           comment.id: {
           "content": comment.content,
-          "likes": comment.likes,
+          "likes": [],
           "time": comment.time,
           "uid": comment.uid,
-          "replies": comment.replies,
+          "replies": {},
         }
       }
     }, SetOptions(merge: true));
@@ -358,6 +394,23 @@ class Firestore{
           "replies": {
             reply.id: {
               "likes": FieldValue.arrayRemove([context.read<UserProvidor>().currentUser.uid])
+            }
+          }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> addClass(ClassData classData, String year, String sem, BuildContext context) async{
+    UserData user = context.read<UserProvidor>().currentUser;
+    DocumentReference docRef = db.collection("users").doc(user.uid);
+    await docRef.set({
+      "classes": {
+        year: {
+          sem: {
+            classData.name: {
+              "description": classData.description,
+              "grade": classData.grade,
             }
           }
         }
