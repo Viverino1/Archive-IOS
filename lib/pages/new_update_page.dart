@@ -77,12 +77,37 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                   _post = PostData();
                 });
               });
-
             },
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.zero,
+            borderRadius: BorderRadius.circular(10),
             minSize: 0,
-            color: CupertinoTheme.of(context).primaryColor,
-            child: Text("Publish", style: smallTitle,),
+            child: Container(
+              decoration: BoxDecoration(
+                color: CupertinoTheme.of(context).primaryColor.withOpacity(0.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CupertinoTheme.of(context).primaryColor,
+                      spreadRadius: 0,
+                      blurRadius: 12,
+                    ),
+                  ],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: CupertinoTheme.of(context).primaryColor.withOpacity(0.5),
+                  width: 2
+                )
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5)
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                  child: Text("Publish", style: smallTitle.copyWith(color: Colors.white),),
+                ),
+              )
+            ),
           ),
           backgroundColor: Colors.transparent,
         ),
@@ -96,7 +121,7 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 112, right: 16, left: 16),
+                          padding: const EdgeInsets.only(top: 106, right: 12, left: 12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -137,7 +162,7 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                                         color: CupertinoTheme.of(context).barBackgroundColor
                                     ),
                                     borderRadius: BorderRadius.circular(12),
-                                    color: CupertinoTheme.of(context).barBackgroundColor
+                                    color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5)
                                 ),
                                 placeholder: "2nd Place in FBLA Missouri SLC",
                                 style: smallTitle,
@@ -161,7 +186,7 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                                         color: CupertinoTheme.of(context).barBackgroundColor
                                     ),
                                     borderRadius: BorderRadius.circular(12),
-                                    color: CupertinoTheme.of(context).barBackgroundColor
+                                    color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5)
                                 ),
                                 style: subTitle,
                                 placeholder: "In the Future Business Leaders of America (FBLA)...",
@@ -231,8 +256,12 @@ class MyCarouselState extends State<MyCarousel> {
                 width: 300,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: CupertinoTheme.of(context).barBackgroundColor,
+                  color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: CupertinoTheme.of(context).barBackgroundColor,
+                    width: 2
+                  )
                 ),
                 child: Center(
                     child: Column(

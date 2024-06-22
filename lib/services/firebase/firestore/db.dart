@@ -1,13 +1,17 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fbla_nlc_2024/classes.dart';
-import 'package:fbla_nlc_2024/components/post.dart';
+import 'package:fbla_nlc_2024/services/gemini/gemini.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_input/image_input.dart';
 import 'package:provider/provider.dart';
+import 'package:random_name_generator/random_name_generator.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../data/providors.dart';
 
@@ -18,11 +22,11 @@ class TestUser{
 class Firestore{
   static final db = FirebaseFirestore.instance;
 
-  static Future<UserData?> getUser(String uid) async {
+  static Future<UserData?> getUser(String uid, [DocumentSnapshot<Map<String, dynamic>>? snap]) async {
     UserData user = UserData();
 
     final docRef = db.collection("users").doc(uid);
-    final docSnap = await docRef.get();
+    final docSnap = snap?? await docRef.get();
 
     if(!docSnap.exists){
       return null;
@@ -41,7 +45,7 @@ class Firestore{
     user.psat = data?["psat"];
     user.preact = data?["preact"];
     user.school = data?["school"];
-    user.volunteerHours = data?["volunteerHours"];
+    user.volunteerHours = data?["volunteerHours"].toDouble();
     user.gradYear = data?["gradYear"];
     user.following = List.from(data?['following']);
 
@@ -84,9 +88,7 @@ class Firestore{
       "volunteerHours": user.volunteerHours,
       "gradYear": user.gradYear,
       "following": user.following,
-      "classes": {
-
-      }
+      "classes": {}
     });
 
     return user;
@@ -135,12 +137,13 @@ class Firestore{
   }
 
   static Future<List<PostData>> getFeedPosts(BuildContext context) async{
+    print("Getting Feed Posts");
     List<PostData> posts = [];
 
     // final querySnap = await db.collection("posts").where("uid", whereIn: [user.uid]).get();
     final querySnap = await db.collection("posts")
         .where("uid", isNotEqualTo: context.read<UserProvidor>().currentUser.uid)
-        //.orderBy("date", descending: true)
+        .orderBy("date", descending: true)
         .get();
 
     for(var doc in querySnap.docs){
@@ -190,7 +193,7 @@ class Firestore{
     
     final querySnap = await db.collection("posts")
         .where("uid", isEqualTo: user.uid)
-        //.orderBy("date", descending: true)
+        .orderBy("date", descending: true)
         .get();
 
     querySnap.docs.forEach((doc) async{
@@ -255,7 +258,6 @@ class Firestore{
     DocumentReference docRef = db.collection("posts").doc(post.id);
     DocumentSnapshot docSnap = await docRef.get();
     if(!docSnap.exists){
-      print("null");
       return post.comments;
     }
 
@@ -418,7 +420,141 @@ class Firestore{
     }, SetOptions(merge: true));
   }
 
-  static void testFunc() async{
+  static Future<List<UserData>> getFollowers(BuildContext context) async{
+    UserData user = context.read<UserProvidor>().currentUser;
+    List<UserData> users = [];
+    var snap = await db.collection("users").where("following", arrayContains: user.uid).get();
+    for(var doc in snap.docs){
+      UserData? follower = await context.read<UserProvidor>().getUser(doc.id, doc);
+      if(follower != null){
+        users.add(follower);
+      }
+    }
+    return users;
+  }
 
+  static Future<List<UserData>> getFollowing(BuildContext context) async {
+    UserData? user = await context.read<UserProvidor>().getUser(context.read<UserProvidor>().currentUser.uid);
+    if(user != null){
+      context.read<UserProvidor>().setCurrentUser(user);
+    }
+    List<UserData> users = [];
+    for(var uid in user?.following?? <String>[]){
+      UserData? following = await context.read<UserProvidor>().getUser(uid);
+      if(following != null){
+        users.add(following);
+      }
+    }
+    return users;
+  }
+
+  static Future<void> refreshUser(BuildContext context) async{
+    UserData? user = await getUser(context.read<UserProvidor>().currentUser.uid);
+    if(user != null){
+      context.read<UserProvidor>().setCurrentUser(user);
+    }
+  }
+  
+  static Future<List<UserData>> getAllUsersExceptFollowers(BuildContext context, List<UserData> followers) async{
+    List<UserData> users = [];
+    UserData currentUser = context.read<UserProvidor>().currentUser;
+
+    var followerIDs = followers.map((e) => e.uid);
+    var snap = await db.collection("users").where("uid", whereNotIn: [currentUser.uid, ...followerIDs]).get();
+
+    for(var doc in snap.docs){
+      UserData? user =  await context.read<UserProvidor>().getUser(doc.id, doc);
+      if(user != null){
+        users.add(user);
+      }
+    }
+    
+    return users;
+  }
+
+  static Future<void> followUser(UserData user, BuildContext context)async {
+    UserData currentUser = context.read<UserProvidor>().currentUser;
+    var docRef = db.collection("users").doc(currentUser.uid);
+    docRef.set({
+      "following": FieldValue.arrayUnion([user.uid]),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> unFollowUser(UserData user, BuildContext context)async {
+    UserData currentUser = context.read<UserProvidor>().currentUser;
+    var docRef = db.collection("users").doc(currentUser.uid);
+    docRef.set({
+      "following": FieldValue.arrayRemove([user.uid]),
+    }, SetOptions(merge: true));
+  }
+
+  static void generateDummyUserAndPost() async{
+    var randomNames = RandomNames();
+    UserData user = UserData();
+    user.firstName = randomNames.name();
+    user.lastName = randomNames.surname();
+    user.email = "${user.firstName}.${user.lastName}@example.com";
+    user.uid = Uuid().v4();
+    user.school = "${randomNames.surname()} High School";
+    user.gradYear = Random().nextInt(3) + 2022;
+    user.following.add("Z4TtJcO2Lde6SXehKVryJFmnlF72");
+
+    await db.collection("users").doc(user.uid).set({
+      "email": user.email,
+      "photoUrl": user.photoUrl,
+      "firstName": user.firstName,
+      "lastName": user.lastName,
+      "uid": user.uid,
+      "sat": user.sat,
+      "act": user.act,
+      "psat": user.psat,
+      "preact": user.preact,
+      "school": user.school,
+      "gpa": user.gpa,
+      "volunteerHours": user.volunteerHours,
+      "gradYear": user.gradYear,
+      "following": user.following,
+      "isFake": true,
+      "classes": {}
+    });
+
+
+    final docRef = db.collection("posts").doc();
+    PostData post = new PostData();
+    post.uid = user.uid;
+    post.id = docRef.id;
+    post.title = (await Gemini.getResponse("Give me one academic post title of 5 words length")).replaceAll("*", "");
+    post.description = (await Gemini.getResponse("Create a one sentance description for an academic post.")).replaceAll("*", "");
+    post.type = "AI Generated";
+    var pics = [
+      "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/V29lbOnR6ZM0mquEAIWi%2Fimg0?alt=media&token=4b16ec74-caba-4abf-8342-ecc8aee07c1c",
+      "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/V29lbOnR6ZM0mquEAIWi%2Fimg1?alt=media&token=4e123498-8dbd-4334-bcd1-8bcc54e009a8",
+      "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/V29lbOnR6ZM0mquEAIWi%2Fimg2?alt=media&token=44611a3a-8c5d-48b2-baff-ba28279fef74",
+      "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/V29lbOnR6ZM0mquEAIWi%2Fimg3?alt=media&token=7ca6dc8e-ab11-46ac-b6d2-d8ed9f6fbe66",
+      "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/V29lbOnR6ZM0mquEAIWi%2Fimg4?alt=media&token=57012e71-3ec5-4a22-93f8-3402431d37b9",
+      "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/V29lbOnR6ZM0mquEAIWi%2Fimg5?alt=media&token=328d812c-236e-402e-bf59-4eb5944a9ddf",
+    ];
+
+    post.pics = [pics[Random().nextInt(6)], pics[Random().nextInt(6)]];
+
+    await docRef.set({
+      "description": post.description,
+      "likes": post.likes,
+      "date": post.date,
+      "title": post.title,
+      "type": post.type,
+      "uid": post.uid,
+      "pics": post.pics,
+      "comments": {},
+    });
+  }
+
+  static void deleteAllDummyData() async {
+    for(var doc in (await db.collection("users").where("isFake", isEqualTo: true).get()).docs){
+      doc.reference.delete();
+    }
+    for(var doc in (await db.collection("posts").where("type", isEqualTo: "AI Generated").get()).docs){
+      doc.reference.delete();
+    }
   }
 }

@@ -44,7 +44,7 @@ class _CommentState extends State<Comment> with TickerProviderStateMixin{
               child: Column(
                 children: [
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    UserImage(user: user, isMine: user?.uid == context.read<UserProvidor>().currentUser.uid,),
+                    UserImage(user: user, disable: user?.uid == context.read<UserProvidor>().currentUser.uid,),
                     SizedBox(width: 8,),
                     Flexible(
                       child: Column(

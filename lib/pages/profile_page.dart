@@ -21,7 +21,7 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClientMixin{
   static List<PostData> _posts = [];
   static String _lastUID = "";
 
@@ -72,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: EdgeInsets.zero,
                   child: const Icon(Icons.chevron_left_rounded, size: 36, color: Colors.white,),
                 )] : []),
-                Text("${widget.user.firstName}'s Profile", style: title),
+                Text("Profile", style: title),
               ],
             ),
           ),
@@ -211,6 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         Post(
+                          disableProfile: true,
                           isMine: widget.isMine,
                           postData: e,
                           onDelete: () {
@@ -234,4 +235,7 @@ class _ProfilePageState extends State<ProfilePage> {
         )
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

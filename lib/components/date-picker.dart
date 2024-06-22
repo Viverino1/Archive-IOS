@@ -44,35 +44,47 @@ class DatePickerState extends State<DatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CupertinoButton(
-          onPressed: () => _showDialog(
-            CupertinoDatePicker(
-              initialDateTime: _selected,
-              mode: CupertinoDatePickerMode.date,
-                onDateTimeChanged: (e){
-                  setState(() {
-                    _selected = e;
-                  });
-                  widget.onChange(e.millisecondsSinceEpoch);
-                }
-            )
+    return Expanded(
+      child: CupertinoButton(
+        onPressed: () => _showDialog(
+          CupertinoDatePicker(
+            initialDateTime: _selected,
+            mode: CupertinoDatePickerMode.date,
+              onDateTimeChanged: (e){
+                setState(() {
+                  _selected = e;
+                });
+                widget.onChange(e.millisecondsSinceEpoch);
+              }
+          )
+        ),
+        minSize: 0,
+        padding: EdgeInsets.zero,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5),
+              border: Border.all(
+                  color: CupertinoTheme.of(context).barBackgroundColor,
+                  width: 2
+              )
           ),
-          color: CupertinoTheme.of(context).barBackgroundColor,
-          minSize: 0,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Text(
-                formatDateTime(_selected),
-                style: smallTitle.copyWith(color: Colors.white60),),
-              SizedBox(width: 8,),
-              Icon(Icons.edit_rounded, color: Colors.white60, size: 18,),
-            ],
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  formatDateTime(_selected),
+                  style: smallTitle.copyWith(color: Colors.white60),),
+                SizedBox(width: 8,),
+                Icon(Icons.edit_rounded, color: Colors.white60, size: 16,),
+              ],
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

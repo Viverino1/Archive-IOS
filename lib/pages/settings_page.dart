@@ -40,9 +40,16 @@ class SettingsPage extends StatelessWidget {
             CupertinoButton(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               onPressed: () {
-                Firestore.testFunc();
+                Firestore.generateDummyUserAndPost();
               },
-              child: Text("Test"),
+              child: Text("Generate"),
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              onPressed: () {
+                Firestore.deleteAllDummyData();
+              },
+              child: Text("Delete"),
             )
           ],
         ),

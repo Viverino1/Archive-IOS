@@ -8,12 +8,32 @@ import 'package:provider/provider.dart';
 import 'feed_page.dart';
 import 'network_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  var _controller = CupertinoTabController(initialIndex: 0);
+
+  void setTab(int i){
+    setState(() {
+      _controller.index = i;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
+      controller: _controller,
         backgroundColor: Color.fromARGB(255, 34, 34, 34),
         tabBar: CupertinoTabBar(
           backgroundColor: Colors.transparent.withOpacity(0.75),
@@ -55,7 +75,7 @@ class HomePage extends StatelessWidget {
                 case 3: return ProfilePage(user: context.watch<UserProvidor>().currentUser, isMine: true);
                 case 2: return NewUpdatePage();
                 case 1: return NetworkPage();
-                case 0: return FeedPage();
+                case 0: return FeedPage(navigateToNetworkPage: () => setTab(1),);
                 default: return CupertinoPageScaffold(child: Container());
               }
             },

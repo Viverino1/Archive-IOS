@@ -144,7 +144,7 @@ class _AddClassPageState extends State<AddClassPage> {
                             color: CupertinoTheme.of(context).barBackgroundColor
                         ),
                         borderRadius: BorderRadius.circular(12),
-                        color: CupertinoTheme.of(context).barBackgroundColor
+                        color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5)
                     ),
                     placeholder: "Honors US History",
                     style: smallTitle,
@@ -174,7 +174,7 @@ class _AddClassPageState extends State<AddClassPage> {
                           color: CupertinoTheme.of(context).barBackgroundColor
                       ),
                       borderRadius: BorderRadius.circular(12),
-                      color: CupertinoTheme.of(context).barBackgroundColor,
+                      color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5),
                     ),
                     style: smallTitle,
                     placeholder: "85.62",
@@ -197,8 +197,12 @@ class _AddClassPageState extends State<AddClassPage> {
                   ),
                   _generating? Container(
                     decoration: BoxDecoration(
-                      color: CupertinoTheme.of(context).barBackgroundColor,
-                      borderRadius: BorderRadius.circular(12)
+                      color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: CupertinoTheme.of(context).barBackgroundColor,
+                        width: 2
+                      )
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -228,28 +232,54 @@ class _AddClassPageState extends State<AddClassPage> {
                           color: CupertinoTheme.of(context).barBackgroundColor
                       ),
                       borderRadius: BorderRadius.circular(12),
-                      color: CupertinoTheme.of(context).barBackgroundColor,
+                      color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5),
                     ),
                     placeholder: "Describe your class here...",
                     style: subTitle,
                   ),
-                  SizedBox(height: 12,),
+                  SizedBox(height: 16,),
                   CupertinoButton(
-                      minSize: 0,
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                      color: CupertinoTheme.of(context).primaryColor,
-                      child: Text("Add Class", style: smallTitle,),
-                      onPressed: (){
-                        if(_nameController.text == ""){
-                          showAlert("Class Name", "The \"Class Name\" field is currently empty. Please fill this field to continue.", context);
-                        }else if(_gradeController.text == ""){
-                          showAlert("Class Grade", "The \"Class Grade\" field is currently empty. Please fill this field to continue.", context);
-                        }else if(_descriptionController.text == ""){
-                          showAlert("Class Description", "The \"Class Description\" field is currently empty. Please fill this field to continue.", context);
-                        }else{
-                          addClass();
-                        }
+                    onPressed: (){
+                      if(_nameController.text == ""){
+                        showAlert("Class Name", "The \"Class Name\" field is currently empty. Please fill this field to continue.", context);
+                      }else if(_gradeController.text == ""){
+                        showAlert("Class Grade", "The \"Class Grade\" field is currently empty. Please fill this field to continue.", context);
+                      }else if(_descriptionController.text == ""){
+                        showAlert("Class Description", "The \"Class Description\" field is currently empty. Please fill this field to continue.", context);
+                      }else{
+                        addClass();
                       }
+                    },
+                    padding: EdgeInsets.zero,
+                    borderRadius: BorderRadius.circular(10),
+                    minSize: 0,
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: CupertinoTheme.of(context).primaryColor.withOpacity(0.5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: CupertinoTheme.of(context).primaryColor,
+                                spreadRadius: 0,
+                                blurRadius: 12,
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: CupertinoTheme.of(context).primaryColor.withOpacity(0.25),
+                                width: 2
+                            )
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(0.5)
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                            child: Text("Add Class", style: smallTitle.copyWith(color: Colors.white),),
+                          ),
+                        )
+                    ),
                   ),
                 ],
               ),

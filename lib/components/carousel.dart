@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 class Carousel extends StatefulWidget {
   final List<String> urls;
   List<Widget>? children = [];
-  Carousel({super.key, required this.urls, this.children});
+  Carousel({super.key, required this.urls, this.children, this.disableDots = false, required this.onIndexChange});
+  final bool disableDots;
+  final void Function(int index) onIndexChange;
 
   @override
   State<Carousel> createState() => _CarouselState();
@@ -26,33 +28,32 @@ class _CarouselState extends State<Carousel> {
             enlargeCenterPage: true, // Increase the size of the center item
             enableInfiniteScroll: false, // Enable infinite scroll
             onPageChanged: (index, reason) {
+              widget.onIndexChange(index);
               setState(() {
                 _index = index;
               });
             },
           ),
         ),
-        SizedBox(height: 12,),
-        Stack(
-          children: [
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: widget.urls.map((item) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                        color: widget.urls.indexOf(item) == (_index - (widget.children != null? widget.children!.length : 0))?
-                        Colors.white60 :
-                        Colors.white60.withOpacity(0.25),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+        ...(widget.disableDots? [] : [
+          SizedBox(height: 12,),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: widget.urls.map((item) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                      color: widget.urls.indexOf(item) == (_index - (widget.children != null? widget.children!.length : 0))?
+                      Colors.white60 :
+                      Colors.white60.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(10)
                   ),
-                )).toList()
-            ),
-          ],
-        ),
+                ),
+              )).toList()
+          ),
+        ])
       ],
     );
   }

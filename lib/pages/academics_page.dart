@@ -8,6 +8,7 @@ import 'package:fbla_nlc_2024/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 import '../data/providors.dart';
@@ -121,19 +122,57 @@ class _AcademicsPageState extends State<AcademicsPage> {
                       ],
                     ),
                     children: widget.user.classData[_year]?[_sem]?.map((e) =>
-                        CupertinoListTile(
-                          backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
-                          title: Text(e.name, style: smallTitle),
-                          subtitle: Text("Grade: ${e.grade}%", style: subTitle.copyWith(fontSize: 12),),
-                          leadingSize: 32,
-                          leadingToTitle: 12,
-                          leading: CupertinoButton(
-                            minSize: 0,
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                             showAlert(e.name, "Vivek Maddineni earned a ${e.grade}% in this class.", context);
-                            },
-                            child: Container(
+                        CupertinoButton(
+                          minSize: 0,
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            showCupertinoModalBottomSheet(
+                              context: context,
+                              barrierColor: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+                              backgroundColor: CupertinoTheme.of(context).barBackgroundColor.withOpacity(1),
+                              builder: (context) => Container(
+                                height: MediaQuery.of(context).size.height - 200,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 12,),
+                                      Transform.translate(
+                                        offset: Offset(0, 4),
+                                          child: Text((_year.toLowerCase().contains("rising")? "Summer Break" : "Semester ${_sem == "sem1"? "1" : "2"}"), style: subTitle,)
+                                      ),
+                                      Text(e.name, style: title,),
+                                      SizedBox(height: 8,),
+                                      Text("Details", style: smallTitle,),
+                                      RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(text: "${widget.user.firstName} ${widget.user.lastName} earned a grade of ", style: subTitle),
+                                              TextSpan(text: "${e.grade}%", style: smallTitle),
+                                              TextSpan(text: " in the class ${e.name} during the ${_year.toLowerCase().contains("rising")? "summer before" : _sem == "sem1"? "first semester of" : "second semester of"} their ", style: subTitle),
+                                              TextSpan(text: "${formatYear(_year).replaceAll("Rising ", "")}", style: smallTitle),
+                                              TextSpan(text: " year of High School.", style: subTitle),
+                                            ]
+                                          )
+                                      ),
+                                      // Text("${e.grade}%", style: smallTitle,),
+                                      SizedBox(height: 12,),
+                                      Text("Description", style: smallTitle,),
+                                      Text(e.description, style: subTitle,),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          child: CupertinoListTile(
+                            backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                            title: Text(e.name, style: smallTitle),
+                            subtitle: Text("Grade: ${e.grade}%", style: subTitle.copyWith(fontSize: 12),),
+                            leadingSize: 32,
+                            leadingToTitle: 12,
+                            leading: Container(
                               width: 32,
                                 height: 32,
                                 decoration: BoxDecoration(
@@ -143,8 +182,8 @@ class _AcademicsPageState extends State<AcademicsPage> {
                                   ), CupertinoColors.systemRed),
                                 ),
                             ),
+                            trailing: CupertinoListTileChevron(),
                           ),
-                          trailing: CupertinoListTileChevron(),
                         )
                     ).toList(),
                   ),
@@ -173,21 +212,35 @@ class Circle extends StatelessWidget {
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
               color: CupertinoTheme.of(context).primaryColor,
-              width: 4
+              width: 2
           ),
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 36,
-              child: Text(value == "-1"? "N/A" : value, style: title.copyWith(fontSize: 32),),
+          boxShadow: [
+            BoxShadow(
+              color: CupertinoTheme.of(context).primaryColor,
+              spreadRadius: 0,
+              blurRadius: 12,
             ),
-            SizedBox(height: 4),
-            Text(label, style: subTitle.copyWith(height: 0.85), textAlign: TextAlign.center,),
           ],
+        ),
+        child: Container(
+          width: 96,
+          height: 96,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(0.75),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 36,
+                child: Text(value == "-1"? "N/A" : value, style: title.copyWith(fontSize: 32),),
+              ),
+              SizedBox(height: 4),
+              Text(label, style: subTitle.copyWith(height: 0.85), textAlign: TextAlign.center,),
+            ],
+          ),
         )
     );
   }

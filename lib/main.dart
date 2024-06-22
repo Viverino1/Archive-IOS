@@ -7,6 +7,7 @@ import 'package:fbla_nlc_2024/pages/academics_page.dart';
 import 'package:fbla_nlc_2024/pages/auth_page.dart';
 import 'package:fbla_nlc_2024/pages/hero_page.dart';
 import 'package:fbla_nlc_2024/pages/home_page.dart';
+import 'package:fbla_nlc_2024/pages/network_page.dart';
 import 'package:fbla_nlc_2024/pages/register_page.dart';
 import 'package:fbla_nlc_2024/pages/settings_page.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';

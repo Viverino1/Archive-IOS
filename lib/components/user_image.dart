@@ -6,14 +6,17 @@ import '../classes.dart';
 import '../data/providors.dart';
 String placeholderpfp = "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/placeholderpfp.jpeg?alt=media&token=d0a3d4ca-0e18-4b03-8b8e-d54637ed0b3b";
 class UserImage extends StatelessWidget {
-  const UserImage({super.key, required this.user, required this.isMine});
+  UserImage({super.key, required this.user, required this.disable, this.size = 25, this.spreadRadius = 1, this.blurRadius = 24});
   final UserData? user;
-  final bool isMine;
+  final bool disable;
+  final double size;
+  final double spreadRadius;
+  final double blurRadius;
 
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
-      onPressed: isMine? (){
+      onPressed: disable? (){
 
       } : (){
         if(user != null){
@@ -30,22 +33,22 @@ class UserImage extends StatelessWidget {
                 color: CupertinoTheme.of(context).primaryColor,
                 width: 3
             ),
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(size*2),
             boxShadow: [
               BoxShadow(
                 color: CupertinoTheme.of(context).primaryColor,
-                spreadRadius: 1,
-                blurRadius: 24,
+                spreadRadius: spreadRadius,
+                blurRadius: blurRadius,
               ),
             ]
         ),
         child: Padding(
             padding: const EdgeInsets.all(4),
             child: Container(
-              height: 25,
-              width: 25,
+              height: size,
+              width: size,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(size*2),
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   alignment: FractionalOffset.center,

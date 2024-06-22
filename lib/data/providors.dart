@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fbla_nlc_2024/classes.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
 import 'package:flutter/cupertino.dart';
@@ -52,12 +53,19 @@ class UserProvidor with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<UserData?> getUser(String uid) async{
+  Future<UserData?> getUser(String uid, [DocumentSnapshot<Map<String, dynamic>>? snap]) async{
+    if(uid == _currentUser.uid){
+      return _currentUser;
+    }
     int index = users.indexWhere((element) => element.uid == uid);
     if(index > -1){
       return users[index];
     }else{
-      return await Firestore.getUser(uid);
+      UserData? user = await Firestore.getUser(uid, snap);
+      if(user != null){
+        addUser(user);
+      }
+      return user;
     }
   }
 }

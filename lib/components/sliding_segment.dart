@@ -4,9 +4,10 @@ import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
 
 class SlidingSegment extends StatefulWidget {
-  SlidingSegment({super.key, required this.selected, required this.options});
+  SlidingSegment({super.key, required this.selected, required this.options, required this.onChange});
   int selected;
   final List<String> options;
+  final void Function(String option) onChange;
 
   @override
   State<SlidingSegment> createState() => _SlidingSegmentState();
@@ -21,6 +22,7 @@ class _SlidingSegmentState extends State<SlidingSegment> {
       groupValue: widget.options[widget.selected],
       onValueChanged: (String? value) {
         if (value != null) {
+          widget.onChange(value);
           setState(() {
             widget.selected = widget.options.indexOf(value);
           });

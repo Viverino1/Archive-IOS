@@ -204,7 +204,7 @@ class _CommentsPageState extends State<CommentsPage> {
                                 color: CupertinoTheme.of(context).barBackgroundColor
                             ),
                             borderRadius: BorderRadius.circular(100),
-                            color: CupertinoTheme.of(context).barBackgroundColor,
+                            color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5),
                           ),
                           style: subTitle,
                           placeholder: "Add a Comment",
