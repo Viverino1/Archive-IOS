@@ -1,3 +1,4 @@
+import 'package:fbla_nlc_2024/classes.dart';
 import 'package:fbla_nlc_2024/data/providors.dart';
 import 'package:fbla_nlc_2024/pages/new_update_page.dart';
 import 'package:fbla_nlc_2024/pages/profile_page.dart';
@@ -10,7 +11,6 @@ import 'network_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
   @override
   State<HomePage> createState() => _HomePageState();
 }

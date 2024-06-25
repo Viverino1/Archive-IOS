@@ -1,8 +1,10 @@
 import 'package:cupertino_refresh/cupertino_refresh.dart';
 import 'package:fbla_nlc_2024/classes.dart';
 import 'package:fbla_nlc_2024/components/user_image.dart';
+import 'package:fbla_nlc_2024/data/providors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../components/post.dart';
 import '../services/firebase/firestore/db.dart';
@@ -45,7 +47,7 @@ class _FeedPageState extends State<FeedPage> {
         backgroundColor: Colors.transparent,
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: 78.0),
+        padding: const EdgeInsets.only(top: 86.0),
         child: CupertinoRefresh(
           physics: AlwaysScrollableScrollPhysics(),
           onRefresh: () async{
@@ -71,7 +73,21 @@ class _FeedPageState extends State<FeedPage> {
                       padding: const EdgeInsets.only(top: 12),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[SizedBox(width: 16,)] + _following.map((u) => Padding(
+                        children: <Widget>[
+                          SizedBox(width: 16,),
+                          Column(
+                            children: [
+                              UserImage(
+                                  user: context.read<UserProvidor>().currentUser,
+                                  disable: true,
+                                size: 72,
+                              ),
+                              SizedBox(height: 4,),
+                              Text("${context.read<UserProvidor>().currentUser.firstName}\n${context.read<UserProvidor>().currentUser.lastName}", style: subTitle.copyWith(height: 1), textAlign: TextAlign.center,)
+                            ],
+                          ),
+                          SizedBox(width: 16,),
+                        ] + _following.map((u) => Padding(
                           padding: const EdgeInsets.only(right: 12),
                           child: Column(
                             children: [
@@ -80,8 +96,8 @@ class _FeedPageState extends State<FeedPage> {
                                 size: 72,
                                 disable: false,
                               ),
-                              SizedBox(height: 2,),
-                              Text(u.firstName, style: subTitle,)
+                              SizedBox(height: 4,),
+                              Text("${u.firstName}\n${u.lastName}", style: subTitle.copyWith(height: 1), textAlign: TextAlign.center,)
                             ],
                           ),
                         )).toList() + [
@@ -107,10 +123,10 @@ class _FeedPageState extends State<FeedPage> {
                                   widget.navigateToNetworkPage();
                                 }
                               ),
-                              SizedBox(height: 2,),
-                              Text("Add", style: subTitle,)
+                              SizedBox(height: 4,),
+                              Text("Follow${_following.length > 0? "" : "\nSomeone!"}", style: subTitle.copyWith(height: 1), textAlign: TextAlign.center,)
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),

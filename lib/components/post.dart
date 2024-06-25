@@ -2,6 +2,7 @@
 import 'package:fbla_nlc_2024/components/carousel.dart';
 import 'package:fbla_nlc_2024/components/user_image.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
+import 'package:fbla_nlc_2024/services/share/Share.dart';
 import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -124,7 +125,7 @@ class _PostState extends State<Post> {
                     padding: EdgeInsets.zero,
                     child: Row(
                       children: [
-                        Icon(isLiked? CupertinoIcons.heart_fill : CupertinoIcons.heart, size: 20, color: isLiked? Colors.red : CupertinoTheme.of(context).primaryColor,),
+                        Icon(isLiked? CupertinoIcons.heart_fill : CupertinoIcons.heart, size: 22, color: isLiked? Colors.red : CupertinoTheme.of(context).primaryColor,),
                         SizedBox(width: 4,),
                         Text("${widget.postData.likes.length} Likes", style: smallTitle.copyWith(color: CupertinoTheme.of(context).primaryColor),),
                       ],
@@ -142,16 +143,17 @@ class _PostState extends State<Post> {
                     },
                     padding: EdgeInsets.zero,
                     minSize: 0,
-                    child: Icon(CupertinoIcons.text_bubble, size: 20,),
+                    child: Icon(CupertinoIcons.text_bubble, size: 22,),
                   ),
-                  SizedBox(width: 12,),
+                  SizedBox(width: 16,),
                   CupertinoButton(
-                    onPressed: () {},
+                    onPressed: () {
+                    },
                     padding: EdgeInsets.zero,
                     minSize: 0,
-                    child: Icon(Icons.share_outlined, size: 20,),
+                    child: Icon(Icons.share_outlined, size: 22,),
                   ),
-                  SizedBox(width: 12,),
+                  SizedBox(width: 16,),
                   ...(widget.isMine? [
                     CupertinoButton(
                       onPressed: () async {
@@ -162,7 +164,7 @@ class _PostState extends State<Post> {
                       },
                       minSize: 0,
                       padding: EdgeInsets.zero,
-                      child: Icon(CupertinoIcons.trash, size: 20,),
+                      child: Icon(CupertinoIcons.trash, size: 22,),
                     ),
                   ] : []),
                   SizedBox(width: 8,),

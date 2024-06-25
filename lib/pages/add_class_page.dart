@@ -276,7 +276,7 @@ class _AddClassPageState extends State<AddClassPage> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                            child: Text("Add Class", style: smallTitle.copyWith(color: Colors.white),),
+                            child: Text("Add Class", style: subTitle.copyWith(color: Colors.white, fontSize: 16),),
                           ),
                         )
                     ),

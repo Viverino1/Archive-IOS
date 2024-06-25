@@ -1,3 +1,4 @@
+import 'package:fbla_nlc_2024/pages/home_page.dart';
 import 'package:fbla_nlc_2024/pages/register_page.dart';
 import 'package:fbla_nlc_2024/services/firebase/auth_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -58,16 +59,16 @@ class AuthPage extends StatelessWidget {
             padding: const EdgeInsets.only(right: 32, left: 32, bottom: 32),
             child: CupertinoButton(
               onPressed: (){
-                AuthService.signInWithGoogle().then((user){
+                AuthService.signInWithGoogle(context).then((user){
                   if(user == null){
                     Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => RegisterPage())
+                        CupertinoPageRoute(builder: (context) => RegisterPage())
                     );
                   }else{
                     context.read<UserProvidor>().setCurrentUser(user);
                     context.read<UserProvidor>().setIsAuthenticated(true);
-                    Navigator.pop(context);
+                    Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context) => HomePage()));
                   }
 
                 });

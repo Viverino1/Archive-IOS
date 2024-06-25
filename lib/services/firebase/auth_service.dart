@@ -1,12 +1,15 @@
+import 'package:fbla_nlc_2024/data/providors.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import '../../classes.dart';
 
 class AuthService{
-  static Future<UserData?> signInWithGoogle() async{
-    UserData user = UserData();
+  static Future<UserData?> signInWithGoogle(BuildContext context) async{
+    UserData? user = UserData();
 
     final gUser = await GoogleSignIn().signIn();
     final GoogleSignInAuthentication gAuth = await gUser!.authentication;
@@ -23,11 +26,7 @@ class AuthService{
 
     if(fsu == null) return null;
 
-    user.email = fsu.email;
-    user.photoUrl = fsu.photoUrl;
-    user.firstName = fsu.firstName;
-    user.lastName = fsu.lastName;
-    user.school = fsu.school;
+    user = await context.read<UserProvidor>().getUser(fsu.uid);
 
     return user;
   }

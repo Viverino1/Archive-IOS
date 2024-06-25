@@ -99,7 +99,11 @@ class _CommentsPageState extends State<CommentsPage> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: Column(
-                  children: widget.post.comments.map((c) => Comment(
+                  children: (widget.post.comments.length > 0? <Widget>[] : <Widget>[
+                    SizedBox(height: 12,),
+                    Text("Nobody's here yet.", style: subTitle,),
+                    Text("Be the first to comment!", style: smallTitle,),
+                  ]) + widget.post.comments.map((c) => Comment(
                     comment: c,
                     post: widget.post,
                     onDelete: (){

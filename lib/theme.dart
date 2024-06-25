@@ -7,13 +7,13 @@ final TextStyle title = GoogleFonts.dmSerifDisplay(
     fontWeight: FontWeight.bold
 );
 
-final TextStyle subTitle = GoogleFonts.quicksand(
+final TextStyle subTitle = GoogleFonts.varelaRound(
     fontSize: 14,
     fontWeight: FontWeight.w500,
     color: Colors.white60,
 );
 
-final TextStyle smallTitle = GoogleFonts.quicksand(
+final TextStyle smallTitle = GoogleFonts.varelaRound(
   fontSize: 16,
   fontWeight: FontWeight.bold,
 );

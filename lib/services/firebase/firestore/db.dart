@@ -41,7 +41,7 @@ class Firestore{
     user.uid = data?["uid"];
     user.sat = data?["sat"];
     user.act = data?["act"];
-    user.gpa = data?["gpa"];
+    user.gpa = data?["gpa"].toDouble();;
     user.psat = data?["psat"];
     user.preact = data?["preact"];
     user.school = data?["school"];
@@ -485,6 +485,19 @@ class Firestore{
     var docRef = db.collection("users").doc(currentUser.uid);
     docRef.set({
       "following": FieldValue.arrayRemove([user.uid]),
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> deleteClass(ClassData classData, String year, String sem, BuildContext context) async{
+    UserData currentUser = context.read<UserProvidor>().currentUser;
+    await db.collection("users").doc(currentUser.uid).set({
+      "classes": {
+        year: {
+          sem: {
+            classData.name: FieldValue.delete()
+          }
+        }
+      }
     }, SetOptions(merge: true));
   }
 

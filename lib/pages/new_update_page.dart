@@ -82,31 +82,31 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
             borderRadius: BorderRadius.circular(10),
             minSize: 0,
             child: Container(
-              decoration: BoxDecoration(
-                color: CupertinoTheme.of(context).primaryColor.withOpacity(0.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: CupertinoTheme.of(context).primaryColor,
-                      spreadRadius: 0,
-                      blurRadius: 12,
-                    ),
-                  ],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: CupertinoTheme.of(context).primaryColor.withOpacity(0.5),
-                  width: 2
-                )
-              ),
-              child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: CupertinoTheme.of(context).barBackgroundColor.withOpacity(0.5)
+                    color: CupertinoTheme.of(context).primaryColor.withOpacity(0.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: CupertinoTheme.of(context).primaryColor,
+                        spreadRadius: 0,
+                        blurRadius: 12,
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: CupertinoTheme.of(context).primaryColor.withOpacity(0.25),
+                        width: 2
+                    )
                 ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                  child: Text("Publish", style: smallTitle.copyWith(color: Colors.white),),
-                ),
-              )
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(0.5)
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                    child: Text("Publish", style: subTitle.copyWith(color: Colors.white, fontSize: 16),),
+                  ),
+                )
             ),
           ),
           backgroundColor: Colors.transparent,

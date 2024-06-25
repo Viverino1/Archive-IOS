@@ -110,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
           backgroundColor: Colors.transparent,
         ),
         child: Padding(
-          padding: const EdgeInsets.only(top: 78),
+          padding: const EdgeInsets.only(top: 86),
           child: CupertinoRefresh(
               physics: AlwaysScrollableScrollPhysics(),
               onRefresh: () async {
@@ -122,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               },
               child: Column(
                 children: [
-                  SizedBox(height: 24,),
+                  SizedBox(height: 28,),
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
