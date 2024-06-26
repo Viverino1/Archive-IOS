@@ -1,4 +1,4 @@
-class UserData{ UserData();
+class UserData{ UserData({required String uid});
   String firstName = "";
   String lastName = "";
   String email = "";
@@ -58,8 +58,7 @@ class PostData{
   List<String> pics = [];
   List<String> likes = [];
   List<CommentData> comments = [];
-
-  UserData user = UserData();
+  UserData user = UserData(uid: '');
 }
 
 class CommentData{

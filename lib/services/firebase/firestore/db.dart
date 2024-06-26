@@ -23,7 +23,7 @@ class Firestore{
   static final db = FirebaseFirestore.instance;
 
   static Future<UserData?> getUser(String uid, [DocumentSnapshot<Map<String, dynamic>>? snap]) async {
-    UserData user = UserData();
+    UserData user = UserData(uid: '');
 
     final docRef = db.collection("users").doc(uid);
     final docSnap = snap?? await docRef.get();
@@ -70,7 +70,7 @@ class Firestore{
   static Future<UserData> registerUser(UserData user) async {
     final User fbu = FirebaseAuth.instance.currentUser!;
     user.email = fbu.email?? "";
-    user.photoUrl = fbu.photoURL?? UserData().photoUrl;
+    user.photoUrl = fbu.photoURL?? UserData(uid: '').photoUrl;
     user.uid = fbu.uid;
 
     await db.collection("users").doc(user.uid).set({
@@ -157,7 +157,7 @@ class Firestore{
       post.type = data['type'];
       post.id = doc.id;
       post.likes = List.from(data['likes']);
-      post.user = (await context.read<UserProvidor>().getUser(post.uid))?? UserData();
+      post.user = (await context.read<UserProvidor>().getUser(post.uid))?? UserData(uid: '');
 
       List<String> commentIDs = data['comments'].keys.toList();
       for (var cID in commentIDs) {
@@ -503,7 +503,7 @@ class Firestore{
 
   static void generateDummyUserAndPost() async{
     var randomNames = RandomNames();
-    UserData user = UserData();
+    UserData user = UserData(uid: '');
     user.firstName = randomNames.name();
     user.lastName = randomNames.surname();
     user.email = "${user.firstName}.${user.lastName}@example.com";

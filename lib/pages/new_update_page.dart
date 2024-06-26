@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cross_file_image/cross_file_image.dart';
@@ -16,6 +18,7 @@ import '../components/picker.dart';
 import '../data/providors.dart';
 import '../services/firebase/firestore/db.dart';
 import '../theme.dart';
+import 'package:http/http.dart' as http;
 
 class NewUpdatePage extends StatefulWidget {
   const NewUpdatePage({super.key});
@@ -34,7 +37,51 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
 
+  String? playerId;
+
   @override
+  void initState() {
+    super.initState();
+    // Initialize OneSignal
+    //OneSignal.shared.setAppId("f7222a53-c5f4-4145-aa59-478920364d50");
+  }
+
+  void _onEventTriggered() async {
+    // Replace this with your mechanism to get followers for the current user
+    List<String> followersPlayerIds = await getFollowersPlayerIds();
+
+    // Send notifications to all followers
+    await Future.forEach(followersPlayerIds, (String followerPlayerId) async {
+      final response = await http.post(
+        Uri.parse('https://onesignal.com/api/v1/notifications'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'NzdiNTA1MDktMTNmYS00NDJlLWFmZGUtZTc4NzhhNzliYzFk',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'app_id': 'f7222a53-c5f4-4145-aa59-478920364d50',
+          'include_player_ids': [followerPlayerId],
+          'headings': {'en': 'Someone from your Network just posted'},
+          'contents': {'en': 'Come check out their achievement!'},
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Notification sent to $followerPlayerId');
+      } else {
+        print('Failed to send notification to $followerPlayerId: ${response.body}');
+      }
+    });
+  }
+
+  Future<List<String>> getFollowersPlayerIds() async {
+    // Replace this with your logic to retrieve followers' playerIds
+    // Example: Fetch from a provider or directly from a database
+    List<String> followersPlayerIds = []; // Replace with actual logic
+
+    return followersPlayerIds;
+  }
+
   Widget build(BuildContext context) {
 
     return CupertinoPageScaffold(
@@ -45,6 +92,9 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
           ),
           trailing: CupertinoButton(
             onPressed: () {
+
+
+
               late BuildContext dialogContext;
               showCupertinoDialog(
                   context: context,
@@ -77,6 +127,8 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                   _post = PostData();
                 });
               });
+
+              _onEventTriggered();
             },
             padding: EdgeInsets.zero,
             borderRadius: BorderRadius.circular(10),

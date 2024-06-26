@@ -32,7 +32,7 @@ class SettingsPage extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               onPressed: () async {
                 await AuthService.signOut();
-                context.read<UserProvidor>().setCurrentUser(UserData());
+                context.read<UserProvidor>().setCurrentUser(UserData(uid: ''));
                 context.read<UserProvidor>().setIsAuthenticated(false);
               },
               child: Text("Logout"),
