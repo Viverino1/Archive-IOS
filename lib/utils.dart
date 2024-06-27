@@ -1,5 +1,6 @@
 import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 String formatDateTime(DateTime epoch){
   return epoch.month.toString() + "/" + epoch.day.toString() + "/" + epoch.year.toString();
@@ -26,6 +27,24 @@ String formatPlace(int place){
     return "3rd";
   }else{
     return "${place}th";
+  }
+}
+
+launchPrivacy() async {
+  const url = 'https://docs.google.com/document/d/1MF3WFO3UC6GO1BYzDLiPGMSdH8HkiTMt-3JCYrLvUcY/edit?usp=sharing';
+  if (await canLaunchUrl(Uri.parse(url))) {
+    await launchUrl(Uri.parse(url));
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+launchTerms() async {
+  const url = 'https://docs.google.com/document/d/14FcrzIHSLZq20kGOw10Y2-VMGb8rLyE4KuCGoR3m1m8/edit?usp=sharing';
+  if (await canLaunchUrl(Uri.parse(url))) {
+    await launchUrl(Uri.parse(url));
+  } else {
+    throw 'Could not launch $url';
   }
 }
 

@@ -31,8 +31,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:rxdart/utils.dart';
 
-
-
 import 'firebase_options.dart';
 import 'theme.dart';
 
@@ -56,23 +54,37 @@ void main() {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  static void restartApp(BuildContext context) {
+    context.findAncestorStateOfType<_MyAppState>()?.restartApp();
+  }
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  Key key = UniqueKey();
+
+  void restartApp() {
+    setState(() {
+      key = UniqueKey();
+    });
+  }
+
   final _appLinks = AppLinks();
   GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    initializeApp().then((e){
+    initializeApp().then((e) {
       FlutterNativeSplash.remove();
       _appLinks.uriLinkStream.listen((uri) async {
-        UserData? linkUser = await Firestore.getUser(uri.path.replaceAll("/", ""));
-        if(linkUser != null){
-          _navigatorKey.currentState?.push(CupertinoPageRoute(builder: (ctx) => ProfilePage(user: linkUser, isMine: false)));
+        UserData? linkUser =
+            await Firestore.getUser(uri.path.replaceAll("/", ""));
+        if (linkUser != null) {
+          _navigatorKey.currentState?.push(CupertinoPageRoute(
+              builder: (ctx) => ProfilePage(user: linkUser, isMine: false)));
         }
       });
     });
@@ -90,15 +102,18 @@ class _MyAppState extends State<MyApp> {
 
     final fbu = FirebaseAuth.instance.currentUser;
 
-    if(fbu != null){
-      final UserData? user = await context.read<UserProvidor>().getUser(fbu.uid);
-      if(user != null){
+    if (fbu != null) {
+      final UserData? user =
+          await context.read<UserProvidor>().getUser(fbu.uid);
+      if (user != null) {
         final appLink = await _appLinks.getInitialAppLink();
         if (appLink != null) {
           var uri = Uri.parse(appLink.toString());
-          UserData? linkUser = await Firestore.getUser(uri.path.replaceAll("/", ""));
-          if(linkUser != null){
-            _navigatorKey.currentState?.push(CupertinoPageRoute(builder: (ctx) => ProfilePage(user: linkUser, isMine: false)));
+          UserData? linkUser =
+              await Firestore.getUser(uri.path.replaceAll("/", ""));
+          if (linkUser != null) {
+            _navigatorKey.currentState?.push(CupertinoPageRoute(
+                builder: (ctx) => ProfilePage(user: linkUser, isMine: false)));
           }
         }
         context.read<UserProvidor>().setCurrentUser(user);
@@ -113,7 +128,9 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: _navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: cupertinoDark,
-      home: context.watch<UserProvidor>().isAuthenticated? HomePage() : HeroPage(),
+      home: context.watch<UserProvidor>().isAuthenticated
+          ? HomePage()
+          : HeroPage(),
       routes: {
         '/auth': (context) => AuthPage(),
         '/register': (context) => RegisterPage(),

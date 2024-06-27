@@ -138,7 +138,7 @@ class _AcademicsPageState extends State<AcademicsPage> {
                         user.sat = int.parse(e);
                       }
                     },
-                    options: ["N/A"] + List.generate(41, (index) => ((index+120)*10).toString()),
+                    options: ["N/A"] + List.generate(121, (index) => ((index+40)*10).toString()),
                   ),
                   SizedBox(width: 12,),
                   TestScorePicker(
@@ -151,7 +151,7 @@ class _AcademicsPageState extends State<AcademicsPage> {
                         user.psat = int.parse(e);
                       }
                     },
-                    options: ["N/A"] + List.generate(31, (index) => ((index+120)*10).toString()),
+                    options: ["N/A"] + List.generate(111, (index) => ((index+40)*10).toString()),
                   ),
                 ],
               ),

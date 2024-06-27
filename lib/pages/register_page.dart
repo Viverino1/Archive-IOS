@@ -58,11 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   await Firestore.registerUser(user);
                   context.read<UserProvidor>().setCurrentUser(user);
                   context.read<UserProvidor>().setIsAuthenticated(true);
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                      context,
-                      CupertinoPageRoute(builder: (context) => HomePage())
-                  );
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                 }
               ),
               SizedBox(width: 16,),
@@ -255,7 +251,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             user.sat = int.parse(e);
                           }
                         },
-                        options: ["N/A"] + List.generate(41, (index) => ((index+120)*10).toString()),
+                        options: ["N/A"] + List.generate(121, (index) => ((index+40)*10).toString()),
                       ),
                       SizedBox(width: 12,),
                       TestScorePicker(
@@ -268,7 +264,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             user.psat = int.parse(e);
                           }
                         },
-                        options: ["N/A"] + List.generate(31, (index) => ((index+120)*10).toString()),
+                        options: ["N/A"] + List.generate(111, (index) => ((index+40)*10).toString()),
                       ),
                     ],
                   ),
