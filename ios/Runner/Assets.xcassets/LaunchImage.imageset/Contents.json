@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "PortfoliatorLogo.png 13-22-08-007.png",
+      "filename" : "ArchiveLogo.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "PortfoliatorLogo.png 13-22-08-007 1.png",
+      "filename" : "ArchiveLogo 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "PortfoliatorLogo.png 13-22-08-007 2.png",
+      "filename" : "ArchiveLogo 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
