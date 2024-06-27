@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cross_file_image/cross_file_image.dart';
 import 'package:fbla_nlc_2024/services/firebase/firebase_messaging.dart';
+import 'package:fbla_nlc_2024/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_input/image_input.dart';
@@ -44,43 +45,57 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
         navigationBar: CupertinoNavigationBar(
           leading: Container(
             alignment: AlignmentDirectional.centerStart,
-            child: Text("Create New Update", style: title),
+            child: Text("Create New Experience", style: title),
           ),
           trailing: CupertinoButton(
             onPressed: () {
+              if(_titleController.text.length < 1){
+                showAlert("No Title", "Please give your post a title to create an experience.", context);
+                return;
+              }
 
-              // late BuildContext dialogContext;
-              // showCupertinoDialog(
-              //     context: context,
-              //     //barrierDismissible: true,
-              //     builder: (BuildContext context){
-              //       dialogContext = context;
-              //       return CupertinoAlertDialog(
-              //         title: Text("Creating Update", style: smallTitle,),
-              //         content: Column(
-              //           children: [
-              //             SizedBox(height: 8,),
-              //             CupertinoActivityIndicator(radius: 16,),
-              //           ],
-              //         ),
-              //       );
-              //     }
-              // ).then((value) => setState(() {
-              //   _post = PostData();
-              //   _files = [];
-              // }));
-              // Firestore.makePost(_post, _files, context.read<UserProvidor>().currentUser).then((value) {
-              //   Navigator.pop(dialogContext);
-              //   _pickerKey.currentState?.reset();
-              //   _datePickerKey.currentState?.reset();
-              //   _carouselKey.currentState?.reset();
-              //   _titleController.clear();
-              //   _descController.clear();
-              //   setState(() {
-              //     _files = [];
-              //     _post = PostData();
-              //   });
-              // });
+              if(_descController.text.length < 1){
+                showAlert("No Description", "Please give your post a description to create an experience.", context);
+                return;
+              }
+
+              if(_files.length < 1){
+                showAlert("No Images", "Please add at least one photo to create an experience.", context);
+                return;
+              }
+
+              late BuildContext dialogContext;
+              showCupertinoDialog(
+                  context: context,
+                  //barrierDismissible: true,
+                  builder: (BuildContext context){
+                    dialogContext = context;
+                    return CupertinoAlertDialog(
+                      title: Text("Creating Experience", style: smallTitle,),
+                      content: Column(
+                        children: [
+                          SizedBox(height: 8,),
+                          CupertinoActivityIndicator(radius: 16,),
+                        ],
+                      ),
+                    );
+                  }
+              ).then((value) => setState(() {
+                _post = PostData();
+                _files = [];
+              }));
+              Firestore.makePost(_post, _files, context.read<UserProvidor>().currentUser).then((value) {
+                Navigator.pop(dialogContext);
+                _pickerKey.currentState?.reset();
+                _datePickerKey.currentState?.reset();
+                _carouselKey.currentState?.reset();
+                _titleController.clear();
+                _descController.clear();
+                setState(() {
+                  _files = [];
+                  _post = PostData();
+                });
+              });
             },
             padding: EdgeInsets.zero,
             borderRadius: BorderRadius.circular(10),

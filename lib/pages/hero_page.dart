@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class HeroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor: CupertinoTheme.of(context).primaryColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Stack(
@@ -22,16 +24,16 @@ class HeroPage extends StatelessWidget {
               children: [
                 SizedBox(height: 64,),
                 Text(
-                  "Portfoliator",
+                  "Archive",
                   style: title.copyWith(
                     fontSize: 48,
+                    letterSpacing: 4
                   ),
                 ),
-                SizedBox(height: 4,),
                 Padding(
                   padding: const EdgeInsets.only(right: 126),
                   child: Text(
-                    "Showcase your all your achievements and skills here to share them with the world.",
+                    "Showcase your all your achievements and skills here and share them with the world.",
                     style: subTitle.copyWith(
                         letterSpacing: 1.5,
                         height: 2
@@ -56,9 +58,9 @@ class HeroPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                       child: Row(
                         children: [
-                          Text("Get Started"),
+                          Text("Get Started", style: subTitle.copyWith(fontSize: 18),),
                           SizedBox(width: 8,),
-                          Icon(CupertinoIcons.arrow_right, size: 18,)
+                          Icon(CupertinoIcons.arrow_right, size: 18, color: Colors.white60,)
                         ],
                       ),
                     )
@@ -106,8 +108,8 @@ class _PhonesState extends State<Phones> with SingleTickerProviderStateMixin {
       transform: Matrix4.rotationZ(-3.14/4)..scale(1.75, 1.75)..translate(-280.0, 200.0),
       child: Row(
         children: [
-          Transform(transform: Matrix4.rotationZ(3.14/2)..translate(0.0, animation.value), child: SizedBox(width: MediaQuery.of(context).size.width/2.5, child: Image.network("https://firebasestorage.googleapis.com/v0/b/fbla-mobile-app-2024.appspot.com/o/HeroPics%2FClass%20Details.png?alt=media&token=2ab43fd5-9bca-4aab-9109-8f7fe60028df")),),
-          Transform(transform: Matrix4.rotationZ(0)..translate(0.0, animation.value + 150), child: SizedBox(width: MediaQuery.of(context).size.width/2.5, child: Image.network("https://firebasestorage.googleapis.com/v0/b/fbla-mobile-app-2024.appspot.com/o/HeroPics%2FProfile.png?alt=media&token=f4736666-b661-44bb-89b2-af6d6e6ec533")))
+          Transform(transform: Matrix4.rotationZ(3.14/2)..translate(0.0, animation.value), child: SizedBox(width: MediaQuery.of(context).size.width/2.5, child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.asset('assets/images/HomePage.png'))),),
+          Transform(transform: Matrix4.rotationZ(0)..translate(0.0, animation.value + 150), child: SizedBox(width: MediaQuery.of(context).size.width/2.5, child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.asset('assets/images/PortfolioPage.png'))))
         ],
       ),
     );

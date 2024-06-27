@@ -30,6 +30,8 @@ class _AddClassPageState extends State<AddClassPage> {
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _gradeController = TextEditingController();
 
+  bool _isEditingClassName = false;
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +46,7 @@ class _AddClassPageState extends State<AddClassPage> {
         _descriptionController.text = "Generating a description...";
         _generating = true;
       });
-      String? msg = _nameController.text == ""? "" : await Gemini.getResponse("Give me a description about the high school class ${_nameController.text} no longer than four sentences");
+      String? msg = _nameController.text == ""? "" : await Gemini.getResponse("Give me a one paragraph description about the high school class ${_nameController.text}.");
       setState(() {
         _descriptionController.text = msg;
         _generating = false;
@@ -121,7 +123,7 @@ class _AddClassPageState extends State<AddClassPage> {
         builder: (BuildContext context, BoxConstraints viewportConstraints){
           return SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(top: 102, left: 16, right: 16),
+              padding: const EdgeInsets.only(top: 102, left: 16, right: 16, bottom: 102),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -133,9 +135,17 @@ class _AddClassPageState extends State<AddClassPage> {
                     onTapOutside: (e){
                       FocusScope.of(context).unfocus();
                       submitName();
+                      setState(() {
+                        _isEditingClassName = false;
+                      });
                     },
                     onSubmitted: (e){
                       submitName();
+                    },
+                    onTap: (){
+                      setState(() {
+                        _isEditingClassName = true;
+                      });
                     },
                     controller: _nameController,
                     decoration: BoxDecoration(
@@ -157,6 +167,7 @@ class _AddClassPageState extends State<AddClassPage> {
                     onTapOutside: (e){
                       FocusScope.of(context).unfocus();
                     },
+                    enabled: !_isEditingClassName,
                     keyboardType: TextInputType.numberWithOptions(decimal: true),
                     controller: _gradeController,
                     onChanged: (e){
@@ -218,6 +229,7 @@ class _AddClassPageState extends State<AddClassPage> {
                     onTapOutside: (e){
                       FocusScope.of(context).unfocus();
                     },
+                    enabled: !_isEditingClassName,
                     onChanged: (e){
                       setState(() {
                         _description = e;
@@ -275,7 +287,7 @@ class _AddClassPageState extends State<AddClassPage> {
                               color: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(0.5)
                           ),
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3,),
                             child: Text("Add Class", style: subTitle.copyWith(color: Colors.white, fontSize: 16),),
                           ),
                         )

@@ -72,10 +72,10 @@ class _HomePageState extends State<HomePage> {
           return CupertinoTabView(
             builder: (BuildContext context) {
               switch(index){
-                case 3: return ProfilePage(user: context.watch<UserProvidor>().currentUser, isMine: true);
+                case 3: return ProfilePage(user: context.watch<UserProvidor>().currentUser, isMine: true, navigateToNewPage: () => setTab(2));
                 case 2: return NewUpdatePage();
                 case 1: return NetworkPage();
-                case 0: return FeedPage(navigateToNetworkPage: () => setTab(1),);
+                case 0: return FeedPage(navigateToNetworkPage: () => setTab(1), navigateToProfilePage: () => setTab(3),);
                 default: return CupertinoPageScaffold(child: Container());
               }
             },

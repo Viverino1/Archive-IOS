@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cupertino_refresh/cupertino_refresh.dart';
 import 'package:fbla_nlc_2024/classes.dart';
 import 'package:fbla_nlc_2024/components/user_image.dart';
@@ -11,8 +12,9 @@ import '../services/firebase/firestore/db.dart';
 import '../theme.dart';
 
 class FeedPage extends StatefulWidget {
-  const FeedPage({super.key, required this.navigateToNetworkPage});
+  const FeedPage({super.key, required this.navigateToNetworkPage, required this.navigateToProfilePage});
   final void Function() navigateToNetworkPage;
+  final void Function() navigateToProfilePage;
 
   @override
   State<FeedPage> createState() => _FeedPageState();
@@ -42,7 +44,12 @@ class _FeedPageState extends State<FeedPage> {
         transitionBetweenRoutes: false,
         leading: Container(
           alignment: AlignmentDirectional.centerStart,
-          child: Text("Portfoliator", style: title),
+          child: Row(
+            children: [
+              Image.asset("assets/images/ArchiveLogoWhite.png",),
+              Text("Archive", style: title.copyWith(letterSpacing: 1)),
+            ],
+          ),
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -81,6 +88,7 @@ class _FeedPageState extends State<FeedPage> {
                                   user: context.read<UserProvidor>().currentUser,
                                   disable: true,
                                 size: 72,
+                                onClick: widget.navigateToProfilePage,
                               ),
                               SizedBox(height: 4,),
                               Text("${context.read<UserProvidor>().currentUser.firstName}\n${context.read<UserProvidor>().currentUser.lastName}", style: subTitle.copyWith(height: 1), textAlign: TextAlign.center,)

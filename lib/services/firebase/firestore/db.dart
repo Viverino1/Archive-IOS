@@ -64,6 +64,40 @@ class Firestore{
       }
     }
 
+    for(var year in data?["awards"]?.keys?.toList()){
+      for(var award in data?["awards"]?[year].keys.toList()){
+        AwardData awardData = new AwardData();
+        awardData.title = award;
+        awardData.description = data?["awards"]?[year]?[award]?["description"];
+        awardData.place = data?["awards"]?[year]?[award]?["place"].toInt();
+        user.awards[year]?.add(awardData);
+      }
+    }
+
+    for(var year in data?["clubs"]?.keys?.toList()){
+      for(var club in data?["clubs"]?[year].keys.toList()){
+        ClubData clubData = new ClubData();
+        clubData.name = club;
+        clubData.description = data?["clubs"]?[year]?[club]?["description"];
+        clubData.position = data?["clubs"]?[year]?[club]?["position"];
+
+        user.clubs[year]?.add(clubData);
+      }
+    }
+
+    return user;
+  }
+
+  static Future<UserData> updateUser(UserData user) async {
+    await db.collection("users").doc(user.uid).set({
+      "sat": user.sat,
+      "act": user.act,
+      "psat": user.psat,
+      "preact": user.preact,
+      "gpa": user.gpa,
+      "volunteerHours": user.volunteerHours,
+    }, SetOptions(merge: true));
+
     return user;
   }
 
@@ -88,10 +122,27 @@ class Firestore{
       "volunteerHours": user.volunteerHours,
       "gradYear": user.gradYear,
       "following": user.following,
-      "classes": {}
+      "classes": {},
+      "clubs": {},
+      "awards": {}
     });
 
     return user;
+  }
+
+  static Future<void> setUserImage(XFile img, BuildContext context) async {
+    UserData user = context.read<UserProvidor>().currentUser;
+    File myFile = File(img.path);
+    if(await myFile.exists()){
+      final storageRef = FirebaseStorage.instance.ref().child("${user.uid}/pfp");
+      await storageRef.putFile(myFile);
+      user.photoUrl = await storageRef.getDownloadURL();
+      context.read<UserProvidor>().setCurrentUser(user);
+
+      await db.collection("users").doc(user.uid).set({
+        "photoUrl": user.photoUrl
+      }, SetOptions(merge: true));
+    }
   }
 
   static Future<void> makePost(PostData post, List<XFile> files, UserData user) async{
@@ -102,7 +153,7 @@ class Firestore{
     for(int i = 0; i < files.length; i++){
       File myFile = File(files[i].path);
       if(await myFile.exists()){
-        final storageRef = FirebaseStorage.instance.ref().child("${post.id}/img${i}");
+        final storageRef = FirebaseStorage.instance.ref().child("${post.uid}/${post.id}/img${i}");
         print("putting file ${i}");
         await storageRef.putFile(myFile);
         print("getting file ${i}");
@@ -131,13 +182,12 @@ class Firestore{
   
   static Future<void> deletePost(PostData post)async {
     for(int i = 0; i < post.pics.length; i++){
-      await FirebaseStorage.instance.ref().child("${post.id}/img${i}").delete();
+      await FirebaseStorage.instance.ref().child("${post.uid}/${post.id}/img${i}").delete();
     }
     await db.collection("posts").doc(post.id).delete();
   }
 
   static Future<List<PostData>> getFeedPosts(BuildContext context) async{
-    print("Getting Feed Posts");
     List<PostData> posts = [];
 
     // final querySnap = await db.collection("posts").where("uid", whereIn: [user.uid]).get();
@@ -420,6 +470,36 @@ class Firestore{
     }, SetOptions(merge: true));
   }
 
+  static Future<void> addClub(ClubData club, String year, BuildContext context) async{
+    UserData user = context.read<UserProvidor>().currentUser;
+    DocumentReference docRef = db.collection("users").doc(user.uid);
+    await docRef.set({
+      "clubs": {
+        year: {
+          club.name: {
+            "description": club.description,
+            "position": club.position,
+          }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> addAward(AwardData award, String year, BuildContext context) async{
+    UserData user = context.read<UserProvidor>().currentUser;
+    DocumentReference docRef = db.collection("users").doc(user.uid);
+    await docRef.set({
+      "awards": {
+        year: {
+          award.title: {
+            "description": award.description,
+            "place": award.place,
+          }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
   static Future<List<UserData>> getFollowers(BuildContext context) async{
     UserData user = context.read<UserProvidor>().currentUser;
     List<UserData> users = [];
@@ -496,6 +576,28 @@ class Firestore{
           sem: {
             classData.name: FieldValue.delete()
           }
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> deleteClub(ClubData clubData, String year, BuildContext context) async {
+    UserData currentUser = context.read<UserProvidor>().currentUser;
+    await db.collection("users").doc(currentUser.uid).set({
+      "clubs": {
+        year: {
+          clubData.name: FieldValue.delete()
+        }
+      }
+    }, SetOptions(merge: true));
+  }
+
+  static Future<void> deleteAward(AwardData awardData, String year, BuildContext context) async {
+    UserData currentUser = context.read<UserProvidor>().currentUser;
+    await db.collection("users").doc(currentUser.uid).set({
+      "awards": {
+        year: {
+          awardData.title: FieldValue.delete()
         }
       }
     }, SetOptions(merge: true));

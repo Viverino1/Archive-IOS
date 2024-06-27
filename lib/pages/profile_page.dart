@@ -16,9 +16,10 @@ import 'package:share_plus/share_plus.dart';
 import '../classes.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.user, required this.isMine});
+  const ProfilePage({super.key, required this.user, required this.isMine, required this.navigateToNewPage});
   final UserData user;
   final bool isMine;
+  final Function() navigateToNewPage;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -84,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               CupertinoButton(
                 onPressed: () {
                   Navigator.of(context, rootNavigator: true).push(
-                      CupertinoPageRoute(builder: (context) => AcademicsPage(user: widget.user, isMine: widget.isMine,))
+                      CupertinoPageRoute(builder: (context) => AcademicsPage(user: widget.user, isMine: widget.isMine, navigateToNewPage: widget.navigateToNewPage))
                   );
                 },
                 padding: EdgeInsets.zero,
@@ -143,8 +144,8 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                                 boxShadow: [
                                   BoxShadow(
                                     color: CupertinoTheme.of(context).primaryColor,
-                                    spreadRadius: 1,
-                                    blurRadius: 32,
+                                    spreadRadius: 8,
+                                    blurRadius: 64,
                                   ),
                                 ]
                             ),

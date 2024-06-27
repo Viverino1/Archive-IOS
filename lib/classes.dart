@@ -2,7 +2,7 @@ class UserData{ UserData({required String uid});
   String firstName = "";
   String lastName = "";
   String email = "";
-  int gradYear = 0;
+  int gradYear = DateTime.now().year + 6;
   String photoUrl = "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/placeholderpfp.jpeg?alt=media&token=d0a3d4ca-0e18-4b03-8b8e-d54637ed0b3b";
   int preact = -1;
   int act = -1;
@@ -13,6 +13,20 @@ class UserData{ UserData({required String uid});
   String school = "";
   double volunteerHours = 0;
   List<String> following = [];
+  Map<String, List<ClubData>> clubs = {
+    "freshman": [],
+    "sophomore": [],
+    "junior": [],
+    "senior": [],
+  };
+
+  Map<String, List<AwardData>> awards = {
+    "freshman": [],
+    "sophomore": [],
+    "junior": [],
+    "senior": [],
+  };
+
   Map<String, Map<String, List<ClassData>>> classData = {
     "risingFreshman": {
       "sem1": [],
@@ -83,4 +97,18 @@ class ClassData{
   String name = "";
   String description = "";
   double grade = 0;
+}
+
+class ClubData{
+  ClubData();
+  String position = "";
+  String name = "";
+  String description = "";
+}
+
+class AwardData{
+  AwardData();
+  String title = "";
+  String description = "";
+  int place = 0;
 }
