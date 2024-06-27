@@ -1,8 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cross_file_image/cross_file_image.dart';
+import 'package:fbla_nlc_2024/services/firebase/firebase_messaging.dart';
 import 'package:fbla_nlc_2024/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +20,7 @@ import '../components/picker.dart';
 import '../data/providors.dart';
 import '../services/firebase/firestore/db.dart';
 import '../theme.dart';
+import 'package:http/http.dart' as http;
 
 class NewUpdatePage extends StatefulWidget {
   const NewUpdatePage({super.key});
@@ -35,7 +39,6 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
 
-  @override
   Widget build(BuildContext context) {
 
     return CupertinoPageScaffold(

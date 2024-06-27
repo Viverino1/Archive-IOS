@@ -9,7 +9,7 @@ import '../../classes.dart';
 
 class AuthService{
   static Future<UserData?> signInWithGoogle(BuildContext context) async{
-    UserData? user = UserData();
+    UserData? user = UserData(uid: '');
 
     final gUser = await GoogleSignIn().signIn();
     final GoogleSignInAuthentication gAuth = await gUser!.authentication;

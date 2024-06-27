@@ -22,6 +22,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserData user = UserData(uid: '');
+    user.gradYear = DateTime.now().year + 6;
 
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,

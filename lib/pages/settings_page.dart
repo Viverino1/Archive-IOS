@@ -72,7 +72,7 @@ class SettingsPage extends StatelessWidget {
               padding: EdgeInsets.zero,
               onPressed: () async {
                 await AuthService.signOut();
-                context.read<UserProvidor>().setCurrentUser(UserData());
+                context.read<UserProvidor>().setCurrentUser(UserData(uid: ''));
                 context.read<UserProvidor>().setIsAuthenticated(false);
                 Navigator.pushNamedAndRemoveUntil(context,'/',(_) => false);
               },

@@ -4,7 +4,7 @@ import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
 import 'package:flutter/cupertino.dart';
 
 class UserProvidor with ChangeNotifier {
-  UserData _currentUser = UserData();
+  UserData _currentUser = UserData(uid: '');
   bool _isAuthenticated = false;
   List<String> _followers = [];
   List<String> _following = [];

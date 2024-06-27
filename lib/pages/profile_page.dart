@@ -11,6 +11,8 @@ import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:share_plus/share_plus.dart';
 import '../classes.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -90,7 +92,9 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                 child: Icon(Icons.school_outlined, size: 28,),
               ),
               CupertinoButton(
-                onPressed: () {},
+                onPressed: () {
+                  Share.share("https://porfoliator.page.link/profile/${widget.user.uid}");
+                },
                 padding: EdgeInsets.zero,
                 child: Icon(Icons.share_outlined, size: 24,),
               ),
