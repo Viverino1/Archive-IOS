@@ -5,12 +5,28 @@ String formatDateTime(DateTime epoch){
   return epoch.month.toString() + "/" + epoch.day.toString() + "/" + epoch.year.toString();
 }
 
+String removeRising(String s){
+  return s.toLowerCase().replaceAll("rising", "");
+}
+
 String formatYear(String raw){
   String output = raw.capitalize();
   if(output.contains("Rising")){
     return "Rising ${output.substring(6)}";
   }
   return output;
+}
+
+String formatPlace(int place){
+  if(place == 1){
+    return "1st";
+  }else if(place == 2){
+    return "2nd";
+  }else if(place == 3){
+    return "3rd";
+  }else{
+    return "${place}th";
+  }
 }
 
 void showAlert(String title, String content, BuildContext context){

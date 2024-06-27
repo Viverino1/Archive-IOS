@@ -85,7 +85,7 @@ class _ReplyState extends State<Reply> {
                       ),
                       Transform.translate(
                           offset: const Offset(0, -2),
-                          child: Text(widget.reply.content, style: smallTitle, maxLines: _isExpanded? 999 : 1, overflow: TextOverflow.ellipsis,)
+                          child: Text(strutStyle: StrutStyle(forceStrutHeight: true), widget.reply.content, style: smallTitle, maxLines: _isExpanded? 999 : 1, overflow: TextOverflow.ellipsis,)
                       ),
                     ],
                   ),

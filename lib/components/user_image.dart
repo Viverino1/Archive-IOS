@@ -6,23 +6,29 @@ import '../classes.dart';
 import '../data/providors.dart';
 String placeholderpfp = "https://firebasestorage.googleapis.com/v0/b/portfoliator-2024.appspot.com/o/placeholderpfp.jpeg?alt=media&token=d0a3d4ca-0e18-4b03-8b8e-d54637ed0b3b";
 class UserImage extends StatelessWidget {
-  UserImage({super.key, required this.user, required this.disable, this.size = 25, this.spreadRadius = 1, this.blurRadius = 24});
+  UserImage({super.key, required this.user, required this.disable, this.size = 25, this.spreadRadius = 1, this.blurRadius = 24, this.onClick});
   final UserData? user;
   final bool disable;
   final double size;
   final double spreadRadius;
   final double blurRadius;
+  final Function()? onClick;
 
   @override
   Widget build(BuildContext context) {
     return CupertinoButton(
       onPressed: disable? (){
-
+        if(onClick != null){
+          onClick!();
+        }
       } : (){
         if(user != null){
           Navigator.of(context, rootNavigator: true).push(
-              CupertinoPageRoute(builder: (context) => ProfilePage(user: user!, isMine: user!.uid == context.read<UserProvidor>().currentUser.uid,))
+              CupertinoPageRoute(builder: (context) => ProfilePage(user: user!, isMine: user!.uid == context.read<UserProvidor>().currentUser.uid, navigateToNewPage: (){},))
           );
+        }
+        if(onClick != null){
+          onClick!();
         }
       },
       padding: EdgeInsets.zero,

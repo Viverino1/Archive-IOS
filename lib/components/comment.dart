@@ -106,7 +106,7 @@ class _CommentState extends State<Comment> with TickerProviderStateMixin{
                           ),
                           Transform.translate(
                               offset: const Offset(0, -2),
-                              child: Text(widget.comment.content, style: smallTitle, maxLines: _isExpanded? 999 : 1, overflow: TextOverflow.ellipsis,)
+                              child: Text(strutStyle: StrutStyle(forceStrutHeight: true), widget.comment.content, style: smallTitle, maxLines: _isExpanded? 999 : 1, overflow: TextOverflow.ellipsis,)
                           ),
                         ],
                       ),

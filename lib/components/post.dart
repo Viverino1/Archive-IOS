@@ -46,6 +46,7 @@ class _PostState extends State<Post> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    strutStyle: StrutStyle(forceStrutHeight: true),
                     widget.postData.title,
                     style: smallTitle,
                     overflow: TextOverflow.ellipsis,
@@ -141,19 +142,17 @@ class _PostState extends State<Post> {
                           ))
                       );
                     },
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(horizontal: 8),
                     minSize: 0,
                     child: Icon(CupertinoIcons.text_bubble, size: 22,),
                   ),
-                  SizedBox(width: 16,),
                   CupertinoButton(
                     onPressed: () {
                     },
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.symmetric(horizontal: 8),
                     minSize: 0,
                     child: Icon(Icons.share_outlined, size: 22,),
                   ),
-                  SizedBox(width: 16,),
                   ...(widget.isMine? [
                     CupertinoButton(
                       onPressed: () async {
@@ -163,7 +162,7 @@ class _PostState extends State<Post> {
                         await Firestore.deletePost(widget.postData);
                       },
                       minSize: 0,
-                      padding: EdgeInsets.zero,
+                      padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Icon(CupertinoIcons.trash, size: 22,),
                     ),
                   ] : []),

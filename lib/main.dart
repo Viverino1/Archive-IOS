@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fbla_nlc_2024/classes.dart';
 import 'package:fbla_nlc_2024/data/providors.dart';
@@ -16,6 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
@@ -79,7 +81,6 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/auth': (context) => AuthPage(),
         '/register': (context) => RegisterPage(),
-        '/settings': (context) => SettingsPage(),
       },
     );
   }

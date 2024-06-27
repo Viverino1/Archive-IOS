@@ -1,10 +1,6 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 import 'package:fbla_nlc_2024/classes.dart';
-import 'package:fbla_nlc_2024/components/generic_text_field.dart';
-import 'package:fbla_nlc_2024/components/picker.dart';
 import 'package:fbla_nlc_2024/pages/home_page.dart';
 import 'package:fbla_nlc_2024/services/firebase/firestore/db.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,11 +18,10 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _gpaController = TextEditingController();
+  UserData user = UserData();
 
   @override
   Widget build(BuildContext context) {
-    UserData user = UserData();
-    user.gradYear = DateTime.now().year + 6;
 
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
@@ -66,29 +61,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       context,
                       CupertinoPageRoute(builder: (context) => HomePage())
                   );
-
-                  // Firestore.registerUser(user)
-                  //           .then((value) async {
-                  //         Navigator.pop(context);
-                  //         Navigator.pop(context);
-                  //         Navigator.pop(context);
-                  //         context.read<UserProvidor>().setCurrentUser(user);
-                  //         context.read<UserProvidor>().setIsAuthenticated(true);
-                  //       });
-                  //
-                  //       showCupertinoDialog(
-                  //           context: context,
-                  //           //barrierDismissible: true,
-                  //           builder: (_) => CupertinoAlertDialog(
-                  //             title: Text("Creating Account", style: smallTitle,),
-                  //             content: Column(
-                  //               children: [
-                  //                 SizedBox(height: 8,),
-                  //                 CupertinoActivityIndicator(radius: 16,),
-                  //               ],
-                  //             ),
-                  //           )
-                  //       );
                 }
               ),
               SizedBox(width: 16,),
@@ -115,7 +87,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                     onChanged: (e){
                       user.firstName = e;
-                      print(e);
                     },
                     decoration: BoxDecoration(
                         border: Border.all(
@@ -244,7 +215,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: [
                       TestScorePicker(
                         test: "ACT",
-                        initial: 0,
+                        initial: "N/A",
                         onChange: (e){
                           if(e == "N/A"){
                             user.act = -1;
@@ -256,7 +227,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       SizedBox(width: 12,),
                       TestScorePicker(
-                        initial: 0,
+                        initial: "N/A",
                         test: "Pre-ACT",
                         onChange: (e){
                           if(e == "N/A"){
@@ -273,7 +244,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Row(
                     children: [
                       TestScorePicker(
-                        initial: 0,
+                        initial: "N/A",
                         test: "SAT",
                         onChange: (e){
                           if(e == "N/A"){
@@ -282,11 +253,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             user.sat = int.parse(e);
                           }
                         },
-                        options: ["N/A"] + List.generate(1201, (index) => (1200 - index + 400).toString()),
+                        options: ["N/A"] + List.generate(41, (index) => ((index+120)*10).toString()),
                       ),
                       SizedBox(width: 12,),
                       TestScorePicker(
-                        initial: 0,
+                        initial: "N/A",
                         test: "PSAT",
                         onChange: (e){
                           if(e == "N/A"){
@@ -295,7 +266,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             user.psat = int.parse(e);
                           }
                         },
-                        options: ["N/A"] + List.generate(1101, (index) => (1200 - index + 400).toString()),
+                        options: ["N/A"] + List.generate(31, (index) => ((index+120)*10).toString()),
                       ),
                     ],
                   ),
@@ -395,7 +366,7 @@ class TestScorePicker extends StatefulWidget {
   final List<String> options;
   final void Function(String e) onChange;
   final String test;
-  final int initial;
+  final String initial;
 
   @override
   TestScorePickerState createState() => TestScorePickerState();
@@ -433,7 +404,7 @@ class TestScorePickerState extends State<TestScorePicker> {
   @override
   void initState() {
     super.initState();
-    _selected = widget.initial;
+    _selected = widget.options.indexOf(widget.initial) > 0? widget.options.indexOf(widget.initial) : 0;
   }
 
   @override
