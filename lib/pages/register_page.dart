@@ -22,260 +22,262 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserData user = UserData();
+    user.gradYear = DateTime.now().year + 6;
 
     return CupertinoPageScaffold(
-      resizeToAvoidBottomInset: false,
-      navigationBar: CupertinoNavigationBar(
-        leading: Container(
-          alignment: AlignmentDirectional.centerStart,
-          child: Row(
-            children: [
-              SizedBox(width: 4,),
-              Text("Register", style: title),
-              Spacer(),
-              CupertinoButton(
-                child: Text("Create Account", style: smallTitle,),
-                minSize: 0,
-                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                color: CupertinoTheme.of(context).primaryColor,
-                onPressed: () async{
-                  showCupertinoDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (_) => CupertinoAlertDialog(
-                      title: Column(
+        resizeToAvoidBottomInset: false,
+        navigationBar: CupertinoNavigationBar(
+          leading: Container(
+            alignment: AlignmentDirectional.centerStart,
+            child: Row(
+              children: [
+                SizedBox(width: 4,),
+                Text("Register", style: title),
+                Spacer(),
+                CupertinoButton(
+                    child: Text("Create Account", style: smallTitle,),
+                    minSize: 0,
+                    padding: EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                    color: CupertinoTheme.of(context).primaryColor,
+                    onPressed: () async{
+                      showCupertinoDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (_) => CupertinoAlertDialog(
+                            title: Column(
+                              children: [
+                                CupertinoActivityIndicator(radius: 12,),
+                                SizedBox(height: 8,),
+                                Text("Creating Account", style: smallTitle,),
+                              ],
+                            ),
+                            content: Text("Just a moment, we're setting up your account!", style: subTitle,),
+                          )
+                      );
+                      await Firestore.registerUser(user);
+                      context.read<UserProvidor>().setCurrentUser(user);
+                      context.read<UserProvidor>().setIsAuthenticated(true);
+                      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                            (Route<dynamic> route) => false,
+                      );
+                      // Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                ),
+                SizedBox(width: 16,),
+              ],
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+        child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints viewportConstraints){
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 102, right: 16, left: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 2.0, bottom: 2),
+                        child: Text("First Name", style: subTitle,),
+                      ),
+                      CupertinoTextField(
+                        onTapOutside: (e){
+                          FocusScope.of(context).unfocus();
+                        },
+                        onChanged: (e){
+                          user.firstName = e;
+                        },
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: CupertinoTheme.of(context).barBackgroundColor
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        placeholder: "John",
+                        style: smallTitle,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                        child: Text("Last Name", style: subTitle,),
+                      ),
+                      CupertinoTextField(
+                        onTapOutside: (e){
+                          FocusScope.of(context).unfocus();
+                        },
+                        onChanged: (e){
+                          user.lastName = e;
+                        },
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: CupertinoTheme.of(context).barBackgroundColor
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        placeholder: "Doe",
+                        style: smallTitle,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                        child: Text("School", style: subTitle,),
+                      ),
+                      CupertinoTextField(
+                        onTapOutside: (e){
+                          FocusScope.of(context).unfocus();
+                        },
+                        onChanged: (e){
+                          user.school = e;
+                        },
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: CupertinoTheme.of(context).barBackgroundColor
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        placeholder: "Lafayette High School",
+                        style: smallTitle,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                        child: Text("Total Service Hours", style: subTitle,),
+                      ),
+                      CupertinoTextField(
+                        keyboardType: TextInputType.number,
+                        onTapOutside: (e){
+                          FocusScope.of(context).unfocus();
+                        },
+                        onChanged: (e){
+                          user.volunteerHours = e != ""? double.parse(e) : 0;
+                        },
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: CupertinoTheme.of(context).barBackgroundColor
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        placeholder: "85",
+                        style: smallTitle,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                        child: Text("Unweighted Cumulative GPA", style: subTitle,),
+                      ),
+                      CupertinoTextField(
+                        onTapOutside: (e){
+                          FocusScope.of(context).unfocus();
+                        },
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        controller: _gpaController,
+                        onChanged: (e){
+                          if(e.length > 4|| (e.substring(e.indexOf(".")+1).contains(".")) || (!e.contains(".") && e.length > 1) ||(e != ""? double.parse(e) > 4 : false)){
+                            setState(() {
+                              _gpaController.text = widget.pastGPA;
+                            });
+                          }else{
+                            user.gpa = e != ""? double.parse(e) : 0;
+                            widget.pastGPA = e;
+                          }
+                        },
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 2,
+                                color: CupertinoTheme.of(context).barBackgroundColor
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: CupertinoTheme.of(context).barBackgroundColor
+                        ),
+                        placeholder: "3.87",
+                        style: smallTitle,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
+                        child: Text("Graduation Year", style: subTitle,),
+                      ),
+                      CustomPicker(
+                          options: List.generate(200, (index) => (DateTime.now().year - index + 6).toString()),
+                          onChange: (e){
+                            user.gradYear = int.parse(e);
+                          }
+                      ),
+                      SizedBox(height: 12,),
+                      Text("Official Test Scores", style: smallTitle,),
+                      SizedBox(height: 8,),
+
+                      Row(
                         children: [
-                          CupertinoActivityIndicator(radius: 12,),
-                          SizedBox(height: 8,),
-                          Text("Creating Account", style: smallTitle,),
+                          TestScorePicker(
+                            test: "ACT",
+                            initial: "N/A",
+                            onChange: (e){
+                              if(e == "N/A"){
+                                user.act = -1;
+                              }else{
+                                user.act = int.parse(e);
+                              }
+                            },
+                            options: ["N/A"] + List.generate(36, (index) => (36 - index).toString()),
+                          ),
+                          SizedBox(width: 12,),
+                          TestScorePicker(
+                            initial: "N/A",
+                            test: "Pre-ACT",
+                            onChange: (e){
+                              if(e == "N/A"){
+                                user.preact = -1;
+                              }else{
+                                user.preact = int.parse(e);
+                              }
+                            },
+                            options: ["N/A"] + List.generate(36, (index) => (35 - index).toString()),
+                          ),
                         ],
                       ),
-                      content: Text("Just a moment, we're setting up your account!", style: subTitle,),
-                    )
-                  );
-                  await Firestore.registerUser(user);
-                  context.read<UserProvidor>().setCurrentUser(user);
-                  context.read<UserProvidor>().setIsAuthenticated(true);
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                      context,
-                      CupertinoPageRoute(builder: (context) => HomePage())
-                  );
-                }
-              ),
-              SizedBox(width: 16,),
-            ],
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-      ),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints){
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 102, right: 16, left: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2.0, bottom: 2),
-                    child: Text("First Name", style: subTitle,),
-                  ),
-                  CupertinoTextField(
-                    onTapOutside: (e){
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (e){
-                      user.firstName = e;
-                    },
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 2,
-                            color: CupertinoTheme.of(context).barBackgroundColor
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        color: CupertinoTheme.of(context).barBackgroundColor
-                    ),
-                    placeholder: "John",
-                    style: smallTitle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
-                    child: Text("Last Name", style: subTitle,),
-                  ),
-                  CupertinoTextField(
-                    onTapOutside: (e){
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (e){
-                      user.lastName = e;
-                    },
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 2,
-                            color: CupertinoTheme.of(context).barBackgroundColor
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        color: CupertinoTheme.of(context).barBackgroundColor
-                    ),
-                    placeholder: "Doe",
-                    style: smallTitle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
-                    child: Text("School", style: subTitle,),
-                  ),
-                  CupertinoTextField(
-                    onTapOutside: (e){
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (e){
-                      user.school = e;
-                    },
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 2,
-                            color: CupertinoTheme.of(context).barBackgroundColor
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        color: CupertinoTheme.of(context).barBackgroundColor
-                    ),
-                    placeholder: "Lafayette High School",
-                    style: smallTitle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
-                    child: Text("Total Service Hours", style: subTitle,),
-                  ),
-                  CupertinoTextField(
-                    keyboardType: TextInputType.number,
-                    onTapOutside: (e){
-                      FocusScope.of(context).unfocus();
-                    },
-                    onChanged: (e){
-                      user.volunteerHours = e != ""? double.parse(e) : 0;
-                    },
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 2,
-                            color: CupertinoTheme.of(context).barBackgroundColor
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        color: CupertinoTheme.of(context).barBackgroundColor
-                    ),
-                    placeholder: "85",
-                    style: smallTitle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
-                    child: Text("Unweighted Cumulative GPA", style: subTitle,),
-                  ),
-                  CupertinoTextField(
-                    onTapOutside: (e){
-                      FocusScope.of(context).unfocus();
-                    },
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                    controller: _gpaController,
-                    onChanged: (e){
-                      if(e.length > 4|| (e.substring(e.indexOf(".")+1).contains(".")) || (!e.contains(".") && e.length > 1) ||(e != ""? double.parse(e) > 4 : false)){
-                        setState(() {
-                          _gpaController.text = widget.pastGPA;
-                        });
-                      }else{
-                        user.gpa = e != ""? double.parse(e) : 0;
-                        widget.pastGPA = e;
-                      }
-                    },
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 2,
-                            color: CupertinoTheme.of(context).barBackgroundColor
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        color: CupertinoTheme.of(context).barBackgroundColor
-                    ),
-                    placeholder: "3.87",
-                    style: smallTitle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2.0, bottom: 2, top: 8),
-                    child: Text("Graduation Year", style: subTitle,),
-                  ),
-                  CustomPicker(
-                      options: List.generate(200, (index) => (DateTime.now().year - index + 6).toString()),
-                      onChange: (e){
-                        user.gradYear = int.parse(e);
-                      }
-                  ),
-                  SizedBox(height: 12,),
-                  Text("Official Test Scores", style: smallTitle,),
-                  SizedBox(height: 8,),
-
-                  Row(
-                    children: [
-                      TestScorePicker(
-                        test: "ACT",
-                        initial: "N/A",
-                        onChange: (e){
-                          if(e == "N/A"){
-                            user.act = -1;
-                          }else{
-                            user.act = int.parse(e);
-                          }
-                        },
-                        options: ["N/A"] + List.generate(36, (index) => (36 - index).toString()),
-                      ),
-                      SizedBox(width: 12,),
-                      TestScorePicker(
-                        initial: "N/A",
-                        test: "Pre-ACT",
-                        onChange: (e){
-                          if(e == "N/A"){
-                            user.preact = -1;
-                          }else{
-                            user.preact = int.parse(e);
-                          }
-                        },
-                        options: ["N/A"] + List.generate(36, (index) => (35 - index).toString()),
+                      SizedBox(height: 12,),
+                      Row(
+                        children: [
+                          TestScorePicker(
+                            initial: "N/A",
+                            test: "SAT",
+                            onChange: (e){
+                              if(e == "N/A"){
+                                user.sat = -1;
+                              }else{
+                                user.sat = int.parse(e);
+                              }
+                            },
+                            options: ["N/A"] + List.generate(121, (index) => ((index+40)*10).toString()),
+                          ),
+                          SizedBox(width: 12,),
+                          TestScorePicker(
+                            initial: "N/A",
+                            test: "PSAT",
+                            onChange: (e){
+                              if(e == "N/A"){
+                                user.psat = -1;
+                              }else{
+                                user.psat = int.parse(e);
+                              }
+                            },
+                            options: ["N/A"] + List.generate(111, (index) => ((index+40)*10).toString()),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 12,),
-                  Row(
-                    children: [
-                      TestScorePicker(
-                        initial: "N/A",
-                        test: "SAT",
-                        onChange: (e){
-                          if(e == "N/A"){
-                            user.sat = -1;
-                          }else{
-                            user.sat = int.parse(e);
-                          }
-                        },
-                        options: ["N/A"] + List.generate(41, (index) => ((index+120)*10).toString()),
-                      ),
-                      SizedBox(width: 12,),
-                      TestScorePicker(
-                        initial: "N/A",
-                        test: "PSAT",
-                        onChange: (e){
-                          if(e == "N/A"){
-                            user.psat = -1;
-                          }else{
-                            user.psat = int.parse(e);
-                          }
-                        },
-                        options: ["N/A"] + List.generate(31, (index) => ((index+120)*10).toString()),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-      )
+                ),
+              );
+            }
+        )
     );
   }
 }
@@ -383,21 +385,21 @@ class TestScorePickerState extends State<TestScorePicker> {
 
   void _showDialog(Widget child) {
     showCupertinoModalPopup(context: context,
-        builder: (BuildContext context) => Container(
-          height: 216,
-          padding: const EdgeInsets.only(top: 6.0),
-          // The Bottom margin is provided to align the popup above the system navigation bar.
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          // Provide a background color for the popup.
-          color: CupertinoColors.systemBackground.resolveFrom(context),
-          // Use a SafeArea widget to avoid system overlaps.
-          child: SafeArea(
-            top: false,
-            child: child,
-          ),
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        // The Bottom margin is provided to align the popup above the system navigation bar.
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
+        // Provide a background color for the popup.
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        // Use a SafeArea widget to avoid system overlaps.
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
     );
   }
 
