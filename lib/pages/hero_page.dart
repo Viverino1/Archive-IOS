@@ -105,7 +105,7 @@ class _PhonesState extends State<Phones> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Transform(
-      transform: Matrix4.rotationZ(-3.14/4)..scale(1.75, 1.75)..translate(-280.0, 200.0),
+      transform: Matrix4.rotationZ(-3.14/4)..scale(1.75, 1.75)..translate(-280.0, 160.0),
       child: Row(
         children: [
           Transform(transform: Matrix4.rotationZ(3.14/2)..translate(0.0, animation.value), child: SizedBox(width: MediaQuery.of(context).size.width/2.5, child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.asset('assets/images/HomePage.png'))),),

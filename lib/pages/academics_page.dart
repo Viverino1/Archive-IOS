@@ -21,10 +21,10 @@ import '../data/providors.dart';
 import '../theme.dart';
 
 class AcademicsPage extends StatefulWidget {
-  AcademicsPage({super.key, required this.user, required this.isMine, required this.navigateToNewPage});
+  AcademicsPage({super.key, required this.user, required this.isMine, this.navigateToNewPage});
   UserData user;
   final bool isMine;
-  final Function() navigateToNewPage;
+  final Function()? navigateToNewPage;
 
   String pastGPA = "";
 
@@ -767,7 +767,9 @@ class _AcademicsPageState extends State<AcademicsPage> {
                       ...(widget.isMine? [
                         CupertinoButton(
                           onPressed: (){
-                            widget.navigateToNewPage();
+                            if(widget.navigateToNewPage != null){
+                              widget.navigateToNewPage!();
+                            }
                             Navigator.pop(context);
                           },
                           padding: EdgeInsets.zero,

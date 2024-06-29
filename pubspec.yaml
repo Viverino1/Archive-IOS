@@ -49,6 +49,7 @@ dependencies:
   smooth_page_indicator: ^1.1.0
   social_share: ^2.3.1
   http: ^1.2.1
+  app_links: ^6.1.3
   path_provider: ^2.1.3
   pull_down_button: ^0.9.4
   cupertino_refresh: ^0.9.5

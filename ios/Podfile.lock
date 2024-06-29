@@ -815,6 +815,8 @@ PODS:
     - abseil/base/base_internal
     - abseil/base/config
     - abseil/meta/type_traits
+  - app_links (0.0.1):
+    - Flutter
   - AppAuth (1.7.4):
     - AppAuth/Core (= 1.7.4)
     - AppAuth/ExternalUserAgent (= 1.7.4)
@@ -1036,6 +1038,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_links (from `.symlinks/plugins/app_links/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -1078,6 +1081,8 @@ SPEC REPOS:
     - RecaptchaInterop
 
 EXTERNAL SOURCES:
+  app_links:
+    :path: ".symlinks/plugins/app_links/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   firebase_auth:
@@ -1107,6 +1112,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: ebec4f56469dd7ce9ab08683c0319a68aa0ad86e
+  app_links: e70ca16b4b0f88253b3b3660200d4a10b4ea9795
   AppAuth: 182c5b88630569df5acb672720534756c29b3358
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   cloud_firestore: a291c7ca0e498f9b08bbabd47a2499a5ae02c152
