@@ -22,6 +22,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
@@ -55,6 +56,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initializeApp().then((e) => FlutterNativeSplash.remove());
+
     _appLinks.uriLinkStream.listen((uri) async {
       print(uri.path);
       if(uri.path.contains("support")){
@@ -88,6 +90,14 @@ class _MyAppState extends State<MyApp> {
     if(fbu != null){
       final UserData? user = await context.read<UserProvidor>().getUser(fbu.uid);
       if(user != null){
+        OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+        OneSignal.initialize("27c7ab08-f87c-4a08-81d8-fcca68c227b9");
+        String? id = await OneSignal.User.getOnesignalId();
+        if(id != null){
+          Firestore.setOnesignalId(id, user);
+        }
+        OneSignal.Notifications.requestPermission(true);
+
         context.read<UserProvidor>().setCurrentUser(user);
         context.read<UserProvidor>().setIsAuthenticated(true);
       }

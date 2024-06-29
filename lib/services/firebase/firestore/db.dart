@@ -22,6 +22,13 @@ class TestUser{
 class Firestore{
   static final db = FirebaseFirestore.instance;
 
+  static Future<void> setOnesignalId(String id, UserData user) async{
+
+    db.collection("users").doc(user.uid).set({
+      "onesignalId": id,
+    }, SetOptions(merge: true));
+  }
+
   static Future<UserData?> getUser(String uid, [DocumentSnapshot<Map<String, dynamic>>? snap]) async {
     UserData user = UserData();
 
@@ -48,6 +55,8 @@ class Firestore{
     user.volunteerHours = data?["volunteerHours"].toDouble();
     user.gradYear = data?["gradYear"];
     user.following = List.from(data?['following']);
+
+    user.onesignalId = data?["onesignalId"]?? "";
 
     for(var year in data?["classes"].keys.toList()){
       for(var sem in data?["classes"][year].keys.toList()){
@@ -122,6 +131,7 @@ class Firestore{
       "volunteerHours": user.volunteerHours,
       "gradYear": user.gradYear,
       "following": user.following,
+      "onesignalId": "",
       "classes": {},
       "clubs": {},
       "awards": {}

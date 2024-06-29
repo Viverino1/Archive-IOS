@@ -13,6 +13,7 @@ class UserData{ UserData();
   String school = "";
   double volunteerHours = 0;
   List<String> following = [];
+  String onesignalId = "";
   Map<String, List<ClubData>> clubs = {
     "freshman": [],
     "sophomore": [],
