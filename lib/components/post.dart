@@ -148,7 +148,7 @@ class _PostState extends State<Post> {
                   ),
                   CupertinoButton(
                     onPressed: () {
-                      Share.share(widget.postData);
+                      InstaShare.share(widget.postData);
                     },
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     minSize: 0,

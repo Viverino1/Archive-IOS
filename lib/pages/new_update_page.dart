@@ -3,6 +3,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cross_file_image/cross_file_image.dart';
+import 'package:fbla_nlc_2024/services/share/Share.dart';
 import 'package:fbla_nlc_2024/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,8 @@ class _NewUpdatePageState extends State<NewUpdatePage> {
                 showAlert("No Images", "Please add at least one photo to create an experience.", context);
                 return;
               }
+
+              sendNotification(context, "${context.read<UserProvidor>().currentUser.firstName} posted a new experience. Come check it out!");
 
               late BuildContext dialogContext;
               showCupertinoDialog(

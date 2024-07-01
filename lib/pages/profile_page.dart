@@ -11,13 +11,14 @@ import 'package:fbla_nlc_2024/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import '../classes.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.user, required this.isMine, required this.navigateToNewPage});
+  const ProfilePage({super.key, required this.user, required this.isMine, this.navigateToNewPage});
   final UserData user;
   final bool isMine;
-  final Function() navigateToNewPage;
+  final Function()? navigateToNewPage;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -90,7 +91,9 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
                 child: Icon(Icons.school_outlined, size: 28,),
               ),
               CupertinoButton(
-                onPressed: () {},
+                onPressed: () {
+                  Share.share("https://portfoliator-2024.web.app/${widget.user.uid}");
+                },
                 padding: EdgeInsets.zero,
                 child: Icon(Icons.share_outlined, size: 24,),
               ),
